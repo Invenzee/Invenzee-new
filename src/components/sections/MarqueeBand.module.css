@@ -1,0 +1,93 @@
+/* Same motion as @keyframes marquee-x in globals.css (0 → -50%).
+   margin-left on .track keeps a constant left bleed so the scroll scrub
+   (±4%) never opens a gap. The two halves stay equal, so the loop is seamless. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08em;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 1rem + 8vw, 9.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.shift {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.scrub {
+  width: 100%;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  margin-left: -6vw;
+  white-space: nowrap;
+  animation: drift 48s linear infinite;
+  animation-play-state: paused;
+}
+
+.reverse {
+  animation-duration: 60s;
+  animation-direction: reverse;
+}
+
+.half {
+  display: flex;
+  flex: none;
+}
+
+.item {
+  display: inline-flex;
+  flex: none;
+  align-items: baseline;
+}
+
+.track :global(.accent) {
+  padding-inline: 0.03em;
+}
+
+.stroke {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: clamp(1px, 0.014em, 1.5px);
+  -webkit-text-stroke-color: color-mix(in srgb, var(--color-white) 45%, transparent);
+  paint-order: stroke fill;
+}
+
+.slash {
+  margin-inline: 0.25em;
+  color: var(--color-cyan);
+  font-weight: 300;
+  -webkit-text-fill-color: var(--color-cyan);
+  -webkit-text-stroke: 0;
+  text-transform: none;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack {
+    padding-inline: var(--m);
+  }
+
+  .track {
+    margin-left: 0;
+    animation: none;
+  }
+}

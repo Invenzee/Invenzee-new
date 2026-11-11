@@ -1,0 +1,165 @@
+/* Slow loops for Artwork. Transform, opacity, and stroke-dashoffset only.
+   Classes are attached only when `animated` is true. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .sway,
+  .nudge,
+  .float,
+  .floatAlt,
+  .pulse,
+  .driftA,
+  .driftB,
+  .playhead,
+  .blink,
+  .draw,
+  .march {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .sway {
+    animation: art-sway 14s var(--ease-io) infinite alternate;
+  }
+
+  .nudge {
+    animation: art-nudge 5.5s var(--ease-io) infinite alternate;
+  }
+
+  .float {
+    animation: art-float 7.5s var(--ease-io) infinite alternate;
+  }
+
+  .floatAlt {
+    animation: art-float-alt 9s var(--ease-io) infinite alternate;
+  }
+
+  .pulse {
+    animation: art-pulse 6s var(--ease-io) infinite alternate;
+  }
+
+  .driftA {
+    animation: art-drift-a 11s var(--ease-io) infinite alternate;
+  }
+
+  .driftB {
+    animation: art-drift-b 13s var(--ease-io) infinite alternate;
+  }
+
+  .playhead {
+    animation: art-playhead 8s var(--ease-io) infinite alternate;
+  }
+
+  .blink {
+    animation: art-blink 4s var(--ease-io) infinite alternate;
+  }
+
+  .draw {
+    stroke-dasharray: 1;
+    animation: art-draw 9s var(--ease-io) infinite alternate;
+  }
+
+  .march {
+    animation: art-march 11s var(--ease-io) infinite alternate;
+  }
+}
+
+@keyframes art-sway {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes art-nudge {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-65%, -48%);
+  }
+}
+
+@keyframes art-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-9%);
+  }
+}
+
+@keyframes art-float-alt {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(8%);
+  }
+}
+
+@keyframes art-pulse {
+  from {
+    opacity: 0.45;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes art-drift-a {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(4%, -5%);
+  }
+}
+
+@keyframes art-drift-b {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-3.5%, 4%);
+  }
+}
+
+@keyframes art-playhead {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(70%);
+  }
+}
+
+@keyframes art-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.12;
+  }
+}
+
+@keyframes art-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes art-march {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 48;
+  }
+}

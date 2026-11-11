@@ -6,10 +6,21 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   turbopack: {
     rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
+      // The Tailwind loader must not rewrite CSS modules as plain CSS.
+      // `as: "*.css"` drops the module export map, so `styles.x` is undefined
+      // and every section class fails to attach.
+      "*.css": [
+        {
+          condition: { path: /\.module\.css$/ },
+          loaders: ["@tailwindcss/turbopack"],
+          as: "*.module.css",
+        },
+        {
+          condition: { not: { path: /\.module\.css$/ } },
+          loaders: ["@tailwindcss/turbopack"],
+          as: "*.css",
+        },
+      ],
     },
   },
 };

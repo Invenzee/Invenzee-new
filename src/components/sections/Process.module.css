@@ -1,0 +1,48 @@
+.node {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-mark);
+  background: var(--color-paper-2);
+  transition:
+    background-color 300ms var(--ease-expo),
+    border-color 300ms var(--ease-expo);
+}
+
+.nodeOn {
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.fill {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.step {
+  min-width: 0;
+}
+
+.num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3.5rem, 2rem + 4.5vw, 6.5rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--fg);
+  transition: color 400ms var(--ease-expo);
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .step {
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (min-width: 1024px) and (hover: hover) {
+  .step:hover .num {
+    color: var(--signal);
+  }
+}

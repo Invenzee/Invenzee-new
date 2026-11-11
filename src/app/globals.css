@@ -1,26 +1,401 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ==========================================================================
+   INVENZEE DESIGN SYSTEM — "Midnight & Signal"
+   Source of truth for colour, type, spacing and motion. See DESIGN.md.
+   ========================================================================== */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Fonts (CSS variables injected by next/font in layout.tsx) */
+  --font-display: var(--font-outfit), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
+  --font-accent: var(--font-remboy), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* Theme-aware colours: resolve differently inside .theme-dark / .theme-light */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-signal: var(--signal);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  /* Brand — sampled from the logo */
+  --color-navy: #101145;
+  --color-cyan: #4bc5de;
+
+  /* Extended palette */
+  --color-ink: #07081c;
+  --color-ink-2: #0e1030;
+  --color-ink-3: #171a4a;
+  --color-cyan-bright: #86e2f5;
+  --color-cyan-deep: #0b7f99;
+  --color-paper: #eff2f6;
+  --color-paper-2: #e1e7ef;
+  --color-white: #ffffff;
+
+  /* Discipline markers — small glyphs and hairlines only, never large fills */
+  --color-lime: #c6f26b;
+  --color-coral: #ff7a59;
+  --color-violet: #9d8cff;
+  --color-amber: #ffc857;
+  --color-pink: #ff8fc7;
+
+  /* Motion */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Radii — logo mark: top-right and bottom-left only */
+  --radius-mark: 0 22% 0 22%;
+  --radius-control: 0 0.85rem 0 0.85rem;
+  --radius-card: 0 22% 0 22%;
+  --radius-tile: 0 22% 0 22%;
+  --radius-sheet: 0 clamp(24px, 3vw, 48px) 0 clamp(24px, 3vw, 48px);
+}
+
+:root {
+  /* Layout */
+  --wrap: 1680px;
+  --m: clamp(20px, 4vw, 64px); /* page margin */
+  --g: clamp(16px, 2vw, 32px); /* grid gutter */
+  --sec: clamp(80px, 9vw, 152px); /* vertical section padding */
+  --nav-h: 76px;
+
+  /* Type scale */
+  --t-hero: clamp(3.25rem, 0.2rem + 12.6vw, 14.5rem);
+  --t-h2: clamp(2.375rem, 1.55rem + 3.4vw, 5rem);
+  --t-h3: clamp(1.5rem, 1.2rem + 1.1vw, 2.25rem);
+  --t-h4: clamp(1.25rem, 1.1rem + 0.55vw, 1.625rem);
+  --t-lead: clamp(1.1875rem, 1.06rem + 0.45vw, 1.5rem);
+  --t-body: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem);
+  --t-small: 0.9375rem;
+  --t-label: 0.75rem;
+
+  /* Default theme = dark */
+  --bg: var(--color-ink);
+  --surface: var(--color-ink-2);
+  --fg: #ffffff;
+  --fg-2: rgb(255 255 255 / 0.72);
+  --fg-3: rgb(255 255 255 / 0.5);
+  --line: rgb(255 255 255 / 0.14);
+  --line-2: rgb(255 255 255 / 0.3);
+  --signal: var(--color-cyan); /* accent that is legible on the current bg */
+}
+
+.theme-dark {
+  --bg: var(--color-ink);
+  --surface: var(--color-ink-2);
+  --fg: #ffffff;
+  --fg-2: rgb(255 255 255 / 0.72);
+  --fg-3: rgb(255 255 255 / 0.5);
+  --line: rgb(255 255 255 / 0.14);
+  --line-2: rgb(255 255 255 / 0.3);
+  --signal: var(--color-cyan);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.theme-light {
+  --bg: var(--color-paper);
+  --surface: #ffffff;
+  --fg: var(--color-navy);
+  --fg-2: rgb(16 17 69 / 0.74);
+  --fg-3: rgb(16 17 69 / 0.52);
+  --line: rgb(16 17 69 / 0.14);
+  --line-2: rgb(16 17 69 / 0.3);
+  --signal: var(--color-cyan-deep);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+html {
+  background: var(--color-ink);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+}
+
+html.is-loading,
+html.is-loading body {
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-cyan);
+  color: var(--color-navy);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 3px;
+  border-radius: var(--radius-mark);
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Layout utilities
+   -------------------------------------------------------------------------- */
+
+@utility wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--m);
+}
+
+@utility sec {
+  padding-block: var(--sec);
+}
+
+@utility grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--g);
+}
+
+/* A light "sheet" laid over the dark page: big rounded corners */
+@utility sheet {
+  border-radius: var(--radius-sheet);
+}
+
+/* Logo corners. `mark` is a circular arc for wide controls (buttons).
+   `mark-tile` is 22% for squares, the same proportion as the icon. */
+@utility mark {
+  border-radius: var(--radius-control);
+}
+
+@utility mark-tile {
+  border-radius: 0 22% 0 22%;
+}
+
+/* --------------------------------------------------------------------------
+   Type utilities
+   -------------------------------------------------------------------------- */
+
+@utility t-hero {
+  font-family: var(--font-display);
+  font-size: var(--t-hero);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+@utility t-h2 {
+  font-family: var(--font-display);
+  font-size: var(--t-h2);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+@utility t-h3 {
+  font-family: var(--font-display);
+  font-size: var(--t-h3);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+@utility t-h4 {
+  font-family: var(--font-display);
+  font-size: var(--t-h4);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+@utility t-lead {
+  font-family: var(--font-sans);
+  font-size: var(--t-lead);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+@utility t-body {
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: 1.55;
+}
+
+@utility t-small {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+
+@utility t-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Accent words, used on 1–2 words per heading */
+@utility accent {
+  font-family: var(--font-accent);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+}
+
+/* --------------------------------------------------------------------------
+   Brand glyphs
+   -------------------------------------------------------------------------- */
+
+/* The signal dot: the rounded cyan square from the "i" in the wordmark.
+   Ends headings instead of a full stop. */
+.dot {
+  display: inline-block;
+  width: 0.2em;
+  height: 0.2em;
+  margin-left: 0.07em;
+  border-radius: var(--radius-mark);
+  background: var(--color-cyan);
+  vertical-align: baseline;
+  flex: none;
+}
+
+/* Small square marker used in labels and lists */
+.sq {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: var(--radius-mark);
+  background: var(--sq, var(--color-cyan));
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Reveal on scroll (see components/ui/Reveal.tsx and Heading.tsx)
+   -------------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 28px), 0);
+  transition:
+    opacity 0.9s var(--ease-expo),
+    transform 1.1s var(--ease-expo);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.hw {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders and italic overhang inside the mask */
+  padding: 0.08em 0.06em 0.16em;
+  margin: -0.08em -0.06em -0.16em;
+}
+.hw > .hwi {
+  display: inline-block;
+  transform: translate3d(0, 115%, 0);
+  transition: transform 1.1s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 45ms + var(--reveal-delay, 0ms));
+  will-change: transform;
+}
+.is-in .hw > .hwi {
+  transform: none;
+}
+.heading .dot {
+  transform: scale(0) rotate(-90deg);
+  transition: transform 0.8s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 45ms + 250ms + var(--reveal-delay, 0ms));
+}
+.heading.is-in .dot {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .hw > .hwi,
+  .heading .dot {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Shared keyframes
+   -------------------------------------------------------------------------- */
+
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }

@@ -1,0 +1,24 @@
+.control {
+  border: 0;
+  border-bottom: 1px solid var(--line-2);
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* The cyan rule under the field is the focus indicator. */
+.control:focus,
+.control:focus-visible {
+  outline: none;
+}
+
+.control:-webkit-autofill,
+.control:-webkit-autofill:hover,
+.control:-webkit-autofill:focus,
+.control:autofill {
+  -webkit-text-fill-color: var(--fg);
+  caret-color: var(--fg);
+  border-bottom-color: var(--line-2);
+  box-shadow: inset 0 0 0 1000px var(--bg);
+  transition: background-color 99999s ease-out;
+}

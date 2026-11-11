@@ -1,0 +1,10 @@
+/* Overrides t-h2's size while keeping its family and weight.
+   font-size and line-height are important so they win whether or not
+   this module is layered above the Tailwind utilities. Letter-spacing
+   stays normal so the accent word can keep its own tracking. */
+.display {
+  font-size: clamp(2.75rem, 1.2rem + 6.4vw, 8rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.04em;
+  max-width: min(12ch, 100%);
+}

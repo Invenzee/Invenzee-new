@@ -1,0 +1,182 @@
+/* Showcase rail
+   Desktop: a sticky stage inside a track whose height is set from JS.
+   Mobile and reduced motion: a native horizontal scroller. */
+
+.section {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.track {
+  position: relative;
+  width: 100%;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding-block: var(--sec);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vw, 72px);
+  width: 100%;
+  min-width: 0;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--m);
+}
+
+.introFoot {
+  margin-top: auto;
+  padding-top: clamp(28px, 4vw, 56px);
+}
+
+.cards {
+  display: flex;
+  gap: clamp(16px, 3vw, 24px);
+  width: 100%;
+  min-width: 0;
+  padding-inline: var(--m);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--m);
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.cards::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex: none;
+  width: min(78vw, 360px);
+  margin: 0;
+  scroll-snap-align: start;
+}
+
+.frame {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  aspect-ratio: 4 / 5;
+}
+
+.zoom,
+.parallax {
+  height: 100%;
+  width: 100%;
+}
+
+.progress {
+  display: none;
+}
+
+.meter {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.meterFill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-cyan);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+/* Desktop scrub: only when there is room and the user allows motion. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100dvh;
+    overflow: hidden;
+    /* Room for the fixed nav above and the progress line below. */
+    padding-top: calc(var(--nav-h) + 8px);
+    padding-bottom: 6.5rem;
+  }
+
+  .rail {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: clamp(24px, 3vw, 56px);
+    padding-inline: var(--m);
+  }
+
+  .intro {
+    flex: none;
+    align-self: stretch;
+    width: clamp(320px, 28vw, 480px);
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  /* Slightly smaller than t-h2 so the heading fits the intro column. */
+  .intro :global(.t-h2) {
+    font-size: clamp(2.25rem, 1.3rem + 2.8vw, 4.25rem);
+  }
+
+  .cards {
+    display: contents;
+  }
+
+  .card {
+    /* 4/5 frame + caption must stay inside the stage, including short laptops. */
+    width: min(500px, max(300px, 28vw), calc((100dvh - var(--nav-h) - 21rem) * 0.8));
+    scroll-snap-align: none;
+  }
+
+  .card:nth-child(odd) .frame {
+    aspect-ratio: 1 / 1;
+  }
+
+  .card:nth-child(even) .frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .zoom {
+    transform: scale(1.14);
+  }
+
+  .progress {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+}
+
+/* Leave the desktop media query: drop the JS height and transforms. */
+@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  .track {
+    height: auto !important;
+  }
+
+  .rail,
+  .parallax,
+  .zoom {
+    transform: none !important;
+  }
+}
