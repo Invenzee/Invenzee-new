@@ -245,7 +245,7 @@ export function Hero() {
         };
       });
 
-      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
         const stage = root.querySelector<HTMLElement>("[data-anim='stage']");
         const track = root.querySelector<HTMLElement>("[data-anim='track']");
         const dot = root.querySelector<HTMLElement>("[data-anim='dot']");
