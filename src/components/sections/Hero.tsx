@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { hero, site, type HeadingPart } from "@/content/site";
+import { hero, type HeadingPart } from "@/content/site";
 import { Artwork } from "@/components/ui/Artwork";
-import { LiveClock } from "@/components/ui/LiveClock";
 import { Reveal } from "@/components/ui/Reveal";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { onReady } from "@/lib/ready";
@@ -36,6 +35,17 @@ function tokenize(parts: readonly HeadingPart[]): Token[] {
   return words;
 }
 
+function Letters({ text }: { text: string }) {
+  return [...text].map((char, index) =>
+    char === " " ? (
+      " "
+    ) : (
+      <span key={`${char}-${index}`} className={styles.letter}>
+        {char}
+      </span>
+    ),
+  );
+}
 const STATEMENT_WORDS = tokenize(hero.statement);
 const STATEMENT_LABEL = hero.statement
   .map((part) => (typeof part === "string" ? part : part.accent))
@@ -115,6 +125,53 @@ export function Hero() {
   const [frame, setFrame] = useState({ active: 0, prev: 0 });
 
   useEffect(() => {
+    const root = rootRef.current;
+    const visual = root?.querySelector<HTMLElement>("[data-tilt]");
+    if (!visual) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let targetY = 0;
+    let targetX = 0;
+    let currentY = 0;
+    let currentX = 0;
+    let frame = 0;
+
+    const onMove = (event: PointerEvent) => {
+      const box = visual.getBoundingClientRect();
+      const over =
+        event.clientX >= box.left &&
+        event.clientX <= box.right &&
+        event.clientY >= box.top &&
+        event.clientY <= box.bottom;
+      if (!over) {
+        targetY = 0;
+        targetX = 0;
+        return;
+      }
+      const px = (event.clientX - (box.left + box.width / 2)) / box.width;
+      const py = (event.clientY - (box.top + box.height / 2)) / box.height;
+      targetY = px * 10;
+      targetX = py * -6;
+    };
+
+    const tick = () => {
+      currentY += (targetY - currentY) * 0.045;
+      currentX += (targetX - currentX) * 0.045;
+      const idle = Math.abs(currentY) < 0.02 && Math.abs(currentX) < 0.02 && targetY === 0 && targetX === 0;
+      visual.style.transform = idle ? "" : `rotateY(${currentY}deg) rotateX(${currentX}deg)`;
+      frame = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("pointermove", onMove);
+      visual.style.transform = "";
+    };
+  }, []);
+
+  useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const count = hero.slides.length;
     const id = window.setInterval(() => {
@@ -155,22 +212,13 @@ export function Hero() {
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const words = gsap.utils.toArray<HTMLElement>("[data-anim='word']", root);
         const line2text = gsap.utils.toArray<HTMLElement>("[data-anim='line2text']", root);
-        const tile = gsap.utils.toArray<HTMLElement>("[data-anim='tile']", root);
         const eyebrow = gsap.utils.toArray<HTMLElement>("[data-anim='eyebrow']", root);
         const dot = gsap.utils.toArray<HTMLElement>("[data-anim='dot']", root);
-        const bar = gsap.utils.toArray<HTMLElement>("[data-anim='bar']", root);
 
         gsap.set(words, { yPercent: 110 });
         gsap.set(line2text, { yPercent: 110 });
-        gsap.set(tile, {
-          scale: 0,
-          rotation: -30,
-          opacity: 0,
-          transformOrigin: "50% 50%",
-        });
         gsap.set(eyebrow, { opacity: 0, y: 18 });
         gsap.set(dot, { scale: 0, rotation: -90, transformOrigin: "50% 50%" });
-        gsap.set(bar, { opacity: 0, y: 12 });
 
         let intro: gsap.core.Timeline | null = null;
         let cancelled = false;
@@ -183,21 +231,15 @@ export function Hero() {
             { yPercent: 0, duration: 1.1, ease: "expo.out", stagger: 0.08 },
             0.06,
           );
-          intro.to(
-            tile,
-            { scale: 1, rotation: -8, opacity: 1, duration: 1.1, ease: "expo.out" },
-            0.08,
-          );
           intro.to(line2text, { yPercent: 0, duration: 1.05, ease: "expo.out" }, 0.18);
           intro.to(dot, { scale: 1, rotation: 0, duration: 0.7, ease: "expo.out" }, 0.42);
-          intro.to(bar, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 0.3);
         });
 
         return () => {
           cancelled = true;
           stop();
           intro?.kill();
-          gsap.set([...words, ...line2text, ...tile, ...eyebrow, ...dot, ...bar], {
+          gsap.set([...words, ...line2text, ...eyebrow, ...dot], {
             clearProps: "all",
           });
         };
@@ -206,57 +248,33 @@ export function Hero() {
       mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
         const stage = root.querySelector<HTMLElement>("[data-anim='stage']");
         const track = root.querySelector<HTMLElement>("[data-anim='track']");
-        const tile = root.querySelector<HTMLElement>("[data-anim='tile']");
+        const dot = root.querySelector<HTMLElement>("[data-anim='dot']");
         const media = root.querySelector<HTMLElement>("[data-anim='media']");
-        if (!stage || !track || !tile || !media) return;
+        if (!stage || !track || !dot || !media) return;
 
-        const lead = root.querySelector<HTMLElement>("[data-mask='lead']");
-        const tail = root.querySelector<HTMLElement>("[data-mask='tail']");
-        const eyebrow = root.querySelector<HTMLElement>("[data-anim='eyebrow']");
-        const line2 = root.querySelector<HTMLElement>("[data-anim='line2']");
-        const bar = root.querySelector<HTMLElement>("[data-anim='bar']");
-        const visual = tile.querySelector<HTMLElement>("[data-visual]");
+        const copy = root.querySelector<HTMLElement>("[data-anim='copy']");
         const scrim = media.querySelector<HTMLElement>("[data-anim='scrim']");
         const corner = media.querySelector<HTMLElement>("[data-corner]");
         const statement = media.querySelector<HTMLElement>("[data-anim='statement']");
         const swords = gsap.utils.toArray<HTMLElement>("[data-sword]", media);
 
-        let mediaIntro: gsap.core.Timeline | null = null;
         let scrollTl: gsap.core.Timeline | null = null;
         let cancelled = false;
         let retries = 0;
-
-        const place = (rotation: number, scale: number) => {
-          const box = measureTile(tile, stage);
-          if (visual) gsap.set(visual, { autoAlpha: 0 });
-          gsap.set(tile, { backgroundColor: "transparent" });
-          gsap.set(media, {
-            left: box.left,
-            top: box.top,
-            width: box.width,
-            height: box.height,
-            rotation,
-            scale,
-            borderRadius: "0 22% 0 22%",
-            transformOrigin: "50% 50%",
-            autoAlpha: 1,
-          });
-          return box;
-        };
 
         const buildScroll = () => {
           if (cancelled || !root.isConnected) return;
           scrollTl?.scrollTrigger?.kill();
           scrollTl?.kill();
 
-          const read = () => measureTile(tile, stage);
+          const read = () => measureTile(dot, stage);
           gsap.set(media, {
             ...read(),
-            rotation: -8,
+            rotation: 0,
             scale: 1,
             borderRadius: "0 22% 0 22%",
             transformOrigin: "50% 50%",
-            autoAlpha: 1,
+            autoAlpha: 0,
           });
           if (swords.length) gsap.set(swords, { opacity: 0.14 });
           if (statement) gsap.set(statement, { opacity: 0 });
@@ -279,9 +297,9 @@ export function Hero() {
               top: () => read().top,
               width: () => read().width,
               height: () => read().height,
-              rotation: -8,
+              rotation: 0,
               scale: 1,
-              borderRadius: "0 22% 0 22%",
+              borderRadius: "0 5% 0 5%",
             },
             {
               left: 0,
@@ -290,7 +308,7 @@ export function Hero() {
               height: () => stage.offsetHeight,
               rotation: 0,
               scale: 1,
-              borderRadius: "0 0 0 0",
+              borderRadius: "0 0% 0 0%",
               ease: "power2.inOut",
               duration: GROW_END,
               immediateRender: false,
@@ -298,67 +316,19 @@ export function Hero() {
             },
             0,
           );
+          scrollTl.to(dot, { autoAlpha: 0, duration: 0.04, ease: "none" }, 0);
+          scrollTl.to(media, { autoAlpha: 1, duration: 0.08, ease: "none" }, 0);
 
-          if (lead) {
+          if (copy) {
             scrollTl.fromTo(
-              lead,
-              { xPercent: 0, opacity: 1 },
+              copy,
+              { y: 0 },
               {
-                xPercent: -42,
-                opacity: 0,
+                y: () => -window.innerHeight * 0.95,
                 ease: "power2.inOut",
                 duration: GROW_END,
                 immediateRender: false,
               },
-              0,
-            );
-          }
-          if (tail) {
-            scrollTl.fromTo(
-              tail,
-              { xPercent: 0, opacity: 1 },
-              {
-                xPercent: 42,
-                opacity: 0,
-                ease: "power2.inOut",
-                duration: GROW_END,
-                immediateRender: false,
-              },
-              0,
-            );
-          }
-          if (eyebrow) {
-            scrollTl.fromTo(
-              eyebrow,
-              { y: 0, opacity: 1 },
-              {
-                y: 36,
-                opacity: 0,
-                ease: "power2.inOut",
-                duration: GROW_END,
-                immediateRender: false,
-              },
-              0,
-            );
-          }
-          if (line2) {
-            scrollTl.fromTo(
-              line2,
-              { y: 0, opacity: 1 },
-              {
-                y: 48,
-                opacity: 0,
-                ease: "power2.inOut",
-                duration: GROW_END,
-                immediateRender: false,
-              },
-              0,
-            );
-          }
-          if (bar) {
-            scrollTl.to(
-              bar,
-              { opacity: 0, duration: 0.32, ease: "power1.in", immediateRender: false },
               0,
             );
           }
@@ -400,32 +370,14 @@ export function Hero() {
 
         const begin = () => {
           if (cancelled || !root.isConnected) return;
-          const box = measureTile(tile, stage);
+          const box = measureTile(dot, stage);
           if (box.width < 2 && retries < 12) {
             retries += 1;
             requestAnimationFrame(begin);
             return;
           }
-
-          if (mediaIntroPlayed.current) {
-            place(-8, 1);
-            buildScroll();
-            return;
-          }
-
-          place(-30, 0);
-          mediaIntro = gsap.timeline({
-            onComplete: () => {
-              mediaIntroPlayed.current = true;
-              buildScroll();
-            },
-          });
-          mediaIntro.to(media, {
-            scale: 1,
-            rotation: -8,
-            duration: 1.1,
-            ease: "expo.out",
-          });
+          mediaIntroPlayed.current = true;
+          buildScroll();
         };
 
         const stop = afterReady(begin);
@@ -433,21 +385,14 @@ export function Hero() {
         return () => {
           cancelled = true;
           stop();
-          mediaIntro?.kill();
           scrollTl?.scrollTrigger?.kill();
           scrollTl?.kill();
           const clear: HTMLElement[] = [media, ...swords];
+          if (copy) clear.push(copy);
           if (statement) clear.push(statement);
           if (scrim) clear.push(scrim);
           if (corner) clear.push(corner);
-          if (lead) clear.push(lead);
-          if (tail) clear.push(tail);
-          if (line2) clear.push(line2);
-          if (eyebrow) clear.push(eyebrow);
-          if (bar) clear.push(bar);
-          if (visual) clear.push(visual);
           gsap.set(clear, { clearProps: "all" });
-          gsap.set(tile, { clearProps: "backgroundColor" });
         };
       });
 
@@ -464,36 +409,37 @@ export function Hero() {
     >
       <div className={styles.track} data-anim="track">
         <div className={styles.stage} data-anim="stage">
-          <div className={styles.copy}>
-            <p className={`t-lead text-fg ${styles.eyebrow}`} data-anim="eyebrow">
+          <div className={styles.copy} data-anim="copy">
+            <p className={`t-lead text-3xl max-sm:text-xl ${styles.eyebrow}`} data-anim="eyebrow">
               {hero.eyebrow}
             </p>
-            <h1 id="hero-title" className={styles.title} aria-label="We invent what's next">
-              <span aria-hidden="true" className={styles.visual}>
+            <h1 id="hero-title" className={styles.title} aria-label="Drive serious conversion">
+              <span aria-hidden="true" className={styles.visual} data-tilt="">
                 <span className={`t-hero ${styles.line1}`}>
                   <span className={styles.mask} data-mask="lead">
                     <span className={styles.word} data-anim="word">
-                      {hero.line1[0]}
-                    </span>
-                  </span>
-                  <span className={styles.tile} data-anim="tile">
-                    <span className={styles.tileVisual} data-visual="">
-                      <ArtStack active={frame.active} prev={frame.prev} />
+                      <Letters text={hero.line1[0]} />
                     </span>
                   </span>
                   <span className={styles.mask} data-mask="tail">
                     <span className={styles.word} data-anim="word">
-                      {hero.line1[1]}
+                      <Letters text={hero.line1[1]} />
                     </span>
                   </span>
                 </span>
                 <span className={styles.line2} data-anim="line2">
                   <span className={styles.mask2}>
                     <span className={`accent ${styles.line2text}`} data-anim="line2text">
-                      {hero.line2}
+                      <Letters text={hero.line2} />
                     </span>
                   </span>
-                  <span className={`dot ${styles.dot}`} data-anim="dot" />
+                  <button type="button" className={`dot ${styles.signal}`} data-anim="dot" aria-label="Pop the mark">
+                    <span className={styles.dotGrow}>
+                      <span className={styles.dotFace}>
+                        <ArtStack active={frame.active} prev={frame.prev} />
+                      </span>
+                    </span>
+                  </button>
                 </span>
               </span>
             </h1>
@@ -504,23 +450,6 @@ export function Hero() {
             <div className={styles.scrim} data-anim="scrim" aria-hidden="true" />
             <div className={styles.statement} data-anim="statement">
               <Statement scroll />
-            </div>
-          </div>
-
-          <div className={`t-label ${styles.bar}`} data-anim="bar">
-            <div className={`wrap ${styles.barInner}`}>
-              <div className={styles.clocks}>
-                {site.clocks.map((clock) => (
-                  <span key={clock.code} className={styles.clock}>
-                    <span>{clock.city}</span>
-                    <LiveClock timeZone={clock.timeZone} className="text-cyan" />
-                  </span>
-                ))}
-              </div>
-              <div className={styles.hint}>
-                <span>{hero.scrollHint}</span>
-                <span className={styles.scrollLine} aria-hidden="true" />
-              </div>
             </div>
           </div>
         </div>

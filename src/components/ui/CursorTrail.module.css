@@ -1,0 +1,53 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.icon {
+  display: none;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+}
+
+.piece[data-kind="logo"] [data-icon="logo"],
+.piece[data-kind="marketing"] [data-icon="marketing"],
+.piece[data-kind="design"] [data-icon="design"],
+.piece[data-kind="code"] [data-icon="code"],
+.piece[data-kind="video"] [data-icon="video"],
+.piece[data-kind="draw"] [data-icon="draw"] {
+  display: block;
+}
+
+.piece[data-kind="marketing"] {
+  color: var(--color-cyan);
+}
+
+.piece[data-kind="design"] {
+  color: var(--color-violet);
+}
+
+.piece[data-kind="code"] {
+  color: var(--color-lime);
+}
+
+.piece[data-kind="video"] {
+  color: var(--color-coral);
+}
+
+.piece[data-kind="draw"] {
+  color: var(--color-amber);
+}

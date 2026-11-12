@@ -68,10 +68,10 @@ export const nav = {
 } as const;
 
 export const hero = {
-  eyebrow: "The all-in-one digital agency",
+  eyebrow: "The digital agency where",
   /* Rendered as:  WE [tile] INVENT  /  what's next■  */
-  line1: ["We", "invent"],
-  line2: "What’s Next",
+  line1: ["Invention", "Meets"],
+  line2: "Creativity",
   /* Artwork shown inside the tile; cycles, then expands to fill the screen on scroll */
   slides: [
     { art: "brand", tone: "navy", caption: "Brand identity" },
@@ -99,7 +99,7 @@ export const about = {
   label: "About Invenzee",
   heading: [
     "One team for ",
-    { accent: "everything" },
+    { accent: "Everything" },
     " your brand needs",
   ] satisfies HeadingPart[],
   lead: "Invenzee is an all-in-one digital agency based in Karachi, working with brands in the USA, Pakistan and beyond.",
@@ -136,7 +136,7 @@ export type Service = {
 export const services = {
   id: "services",
   label: "What we do",
-  heading: ["Our ", { accent: "services" }] satisfies HeadingPart[],
+  heading: ["Our ", { accent: "Services" }] satisfies HeadingPart[],
   intro: "Six disciplines, one team. Hire us for one, or let them work together.",
   list: [
     {

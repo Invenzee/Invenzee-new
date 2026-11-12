@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { DM_Mono, DM_Sans, Outfit } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
+import { CursorTrail } from "@/components/ui/CursorTrail";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="theme-dark min-h-dvh">
         <SmoothScroll>{children}</SmoothScroll>
+        <CursorTrail />
       </body>
     </html>
   );

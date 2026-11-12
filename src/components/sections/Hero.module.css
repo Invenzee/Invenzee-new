@@ -1,6 +1,8 @@
 .hero {
   /* Slightly under --t-hero below ~387px so "WE [tile] INVENT" fits in 100vw - 2*var(--m). */
   --hero-size: clamp(2.55rem, 0.2rem + 12.6vw, 14.5rem);
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .track {
@@ -39,28 +41,44 @@
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
+  perspective: 1100px;
 }
 
 .visual {
   display: flex;
   flex-direction: column;
   align-items: center;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+}
+
+.letter {
+  display: inline-block;
+  transform-origin: center bottom;
+  transition: transform 0.85s var(--ease-expo);
+}
+
+.letter:hover {
+  transform: scaleY(1.08);
 }
 
 .visual .line1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--hero-size);
+  gap: 0.16em;
+  font-size: calc(var(--hero-size) * 0.70);
+  text-transform: capitalize !important;
   white-space: nowrap;
+  margin-bottom: 0.1em;
 }
 
 .mask {
   display: inline-flex;
   flex: none;
   overflow: hidden;
-  margin: -0.12em -0.04em -0.18em;
-  padding: 0.12em 0.04em 0.18em;
+  margin: -0.22em -0.04em -0.18em;
+  padding: 0.22em 0.04em 0.18em;
 }
 
 .word {
@@ -92,7 +110,7 @@
   align-items: baseline;
   justify-content: center;
   margin-top: -0.04em;
-  font-size: calc(var(--hero-size) * 1.02);
+  font-size: calc(var(--hero-size) * 1.20);
   line-height: 0.9;
   white-space: nowrap;
 }
@@ -100,13 +118,63 @@
 .mask2 {
   display: inline-flex;
   overflow: hidden;
-  margin: -0.18em -0.1em -0.28em;
-  padding: 0.18em 0.1em 0.28em;
+  margin: -0.28em -0.1em -0.28em;
+  padding: 0.28em 0.1em 0.28em;
 }
 
 .line2text {
   display: inline-block;
   line-height: 0.9;
+}
+
+.line2 .signal {
+  position: relative;
+  z-index: 3;
+  display: inline-block;
+  width: 0.22em;
+  height: 0.22em;
+  margin-left: 0.08em;
+  padding: 0;
+  overflow: visible;
+  vertical-align: middle;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  line-height: 0;
+}
+
+.dotGrow {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0.22em;
+  height: 0.22em;
+  overflow: hidden;
+  background: var(--color-cyan);
+  border-radius: var(--radius-mark);
+}
+
+.dotFace {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.line2 .signal[data-burst] .dotGrow {
+  animation: dotShrink 0.55s var(--ease-expo);
+}
+
+@keyframes dotShrink {
+  0% {
+    transform: scale(1);
+  }
+  32% {
+    transform: scale(0.7);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .dot {
@@ -312,9 +380,16 @@
 
 @media (prefers-reduced-motion: reduce) {
   .slide,
-  .scrollLine::after {
+  .scrollLine::after,
+  .visual,
+  .letter,
+  .dotGrow {
     transition: none;
     animation: none;
+  }
+
+  .letter:hover {
+    transform: none;
   }
 }
 
