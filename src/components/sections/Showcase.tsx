@@ -1,49 +1,79 @@
 "use client";
 
-import { useRef, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { markerHex, showcase, type ShowcaseItem } from "@/content/site";
 import { Artwork } from "@/components/ui/Artwork";
-import { ArrowLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
-import { Label } from "@/components/ui/Label";
-import { getLenis } from "@/components/providers/SmoothScroll";
+import { setScrollLocked, getLenis } from "@/components/providers/SmoothScroll";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import styles from "./Showcase.module.css";
 
-const pad2 = (n: number) => String(n).padStart(2, "0");
+/** One numbered line per project, plus a single empty step after the last card. */
+const MARKS = Array.from({ length: showcase.items.length + 1 }, (_, index) => (index + 1) * 10);
+/** Three equal ticks in the middle of each gap, clear of the numbers. */
+const MINOR_AT = [0.35, 0.5, 0.65];
 
-/**
- * How far the rail must travel: its content width minus the stage, which is
- * the viewport. scrollWidth is the spec path; if a browser reports no
- * overflow, sum the intro and cards instead.
- */
-function horizontalDistance(rail: HTMLElement, stage: HTMLElement) {
-  const viewport = stage.clientWidth;
-  let content = rail.scrollWidth;
-  if (content <= viewport + 1) {
-    const style = getComputedStyle(rail);
-    const gap = Number.parseFloat(style.columnGap) || 0;
-    const pad =
-      (Number.parseFloat(style.paddingLeft) || 0) +
-      (Number.parseFloat(style.paddingRight) || 0);
-    const boxes = rail.querySelectorAll<HTMLElement>("[data-intro], article");
-    let sum = 0;
-    boxes.forEach((el) => {
-      sum += el.offsetWidth;
+function yardTicks() {
+  const span = MARKS.length - 1;
+  const ticks: { key: string; at: number; label?: number; minor?: boolean }[] = [];
+  MARKS.forEach((mark, index) => {
+    ticks.push({ key: `n-${mark}`, at: index / span, label: mark });
+    if (index === span) return;
+    MINOR_AT.forEach((spot, step) => {
+      ticks.push({
+        key: `m-${mark}-${step}`,
+        at: (index + spot) / span,
+        minor: true,
+      });
     });
-    content = pad + sum + gap * Math.max(0, boxes.length - 1);
-  }
-  return Math.max(0, content - viewport);
+  });
+  return ticks;
+}
+
+function horizontalDistance(rail: HTMLElement, viewport: HTMLElement) {
+  const view = viewport.clientWidth;
+  const fromWidth = Math.max(0, rail.scrollWidth - view);
+  const last = rail.querySelector("article:last-of-type");
+  if (!last) return fromWidth;
+  const railLeft = rail.getBoundingClientRect().left;
+  const lastRight = last.getBoundingClientRect().right - railLeft;
+  // Keep going until the last card sits fully on screen, not clipped at the right edge.
+  const fromLast = Math.max(0, lastRight - view + 64);
+  return Math.max(fromWidth, fromLast);
 }
 
 export function Showcase() {
   const scope = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const fillRef = useRef<HTMLSpanElement>(null);
-  const currentRef = useRef<HTMLSpanElement>(null);
-  const count = showcase.items.length;
+  const [active, setActive] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    let width = "";
+    const fit = () => {
+      const next = `${viewport.clientWidth}px`;
+      if (next === width) return;
+      width = next;
+      viewport.style.setProperty("--work-w", next);
+      if (window.matchMedia("(min-width: 1024px)").matches) viewport.scrollLeft = 0;
+      ScrollTrigger.refresh();
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
 
   useGSAP(
     () => {
@@ -52,52 +82,38 @@ export function Showcase() {
       mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
         const track = trackRef.current;
         const stage = stageRef.current;
+        const viewport = viewportRef.current;
         const rail = railRef.current;
-        if (!track || !stage || !rail) return;
+        if (!track || !stage || !viewport || !rail) return;
 
         let alive = true;
 
+        const resetNativeScroll = () => {
+          if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+        };
+
         const syncHeight = () => {
-          const stageHeight = stage.offsetHeight;
-          const distance = horizontalDistance(rail, stage);
-          // ScrollTrigger from "top top" to "bottom bottom" travels
-          // trackHeight − innerHeight. Using the taller of the stage and the
-          // scrollport keeps that distance equal to the horizontal travel
-          // when 100dvh and the scrollport match, and never shorter.
-          const trackHeight = Math.max(stageHeight, window.innerHeight) + distance;
+          resetNativeScroll();
+          const distance = horizontalDistance(rail, viewport);
+          const trackHeight = Math.max(stage.offsetHeight, window.innerHeight) + distance;
           gsap.set(track, { height: trackHeight });
         };
 
-        const paint = (progress: number) => {
-          const clamped = Math.min(1, Math.max(0, progress));
-          if (fillRef.current) fillRef.current.style.transform = `scaleX(${clamped})`;
-          if (currentRef.current) {
-            const index = Math.min(count, Math.max(1, Math.round(clamped * (count - 1)) + 1));
-            currentRef.current.textContent = pad2(index);
-          }
-        };
+        viewport.addEventListener("scroll", resetNativeScroll);
 
         syncHeight();
         ScrollTrigger.addEventListener("refreshInit", syncHeight);
 
-        const layers = gsap.utils.toArray<HTMLElement>("[data-parallax]", rail);
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
+        const tween = gsap.to(rail, {
+          x: () => -horizontalDistance(rail, viewport),
+          ease: "none",
           scrollTrigger: {
             trigger: track,
             start: "top top",
             end: "bottom bottom",
             scrub: 0.6,
             invalidateOnRefresh: true,
-            onUpdate: (self) => paint(self.progress),
-            onRefresh: (self) => paint(self.progress),
           },
-        });
-
-        tl.to(rail, { x: () => -horizontalDistance(rail, stage) }, 0);
-        layers.forEach((layer, i) => {
-          const shift = 6 + (i % 3) * 2;
-          tl.fromTo(layer, { x: shift }, { x: -shift }, 0);
         });
 
         void document.fonts?.ready.then(() => {
@@ -109,88 +125,194 @@ export function Showcase() {
 
         return () => {
           alive = false;
+          viewport.removeEventListener("scroll", resetNativeScroll);
+          tween.scrollTrigger?.kill();
+          tween.kill();
           ScrollTrigger.removeEventListener("refreshInit", syncHeight);
-          if (fillRef.current) fillRef.current.style.transform = "";
-          if (currentRef.current) currentRef.current.textContent = pad2(1);
+          gsap.set(rail, { clearProps: "transform" });
         };
       });
     },
     { scope },
   );
 
+  const item = active === null ? null : showcase.items[active];
+
   return (
     <section id={showcase.id} ref={scope} className={`theme-dark relative ${styles.section}`}>
       <div ref={trackRef} className={styles.track}>
         <div ref={stageRef} className={styles.stage}>
-          <div ref={railRef} className={styles.rail}>
-            <div className={styles.intro} data-intro>
-              <div>
-                <Label>{showcase.label}</Label>
-                <Heading parts={showcase.heading} as="h2" className="t-h2 mt-6" />
-              </div>
-              <div className={styles.introFoot}>
-                <p className="t-body max-w-[30ch] text-fg-2">{showcase.intro}</p>
-                <ArrowLink href={showcase.link.href} className="mt-8">
-                  {showcase.link.label}
-                </ArrowLink>
-              </div>
-            </div>
+          <header className={styles.head}>
+            <Heading parts={showcase.heading} as="h2" className="t-h2" />
+          </header>
 
-            <div className={styles.cards} data-lenis-prevent>
-              {showcase.items.map((item, index) => (
-                <ShowcaseCard key={item.title} item={item} index={index} />
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.progress} aria-hidden="true">
-            <div className="wrap pb-7">
-              <div className="flex items-center gap-5">
-                <div className={styles.meter}>
-                  <span ref={fillRef} className={styles.meterFill} />
-                </div>
-                <p className="t-label m-0 shrink-0 text-fg-3 tabular-nums">
-                  <span ref={currentRef} className="text-fg">
-                    {pad2(1)}
+          <div ref={viewportRef} className={styles.viewport}>
+            <div ref={railRef} className={styles.rail}>
+              <div className={styles.yard} aria-hidden="true">
+                {yardTicks().map((tick) => (
+                  <span key={tick.key} className={styles.mark} style={{ left: `${tick.at * 100}%` }}>
+                    <span className={tick.minor ? styles.tick : styles.bar} />
+                    {tick.label != null ? <span className={styles.num}>{tick.label}</span> : null}
                   </span>
-                  {" / "}
-                  <span>{pad2(count)}</span>
-                </p>
+                ))}
+              </div>
+
+              <div className={styles.cards}>
+                {showcase.items.map((work, index) => (
+                  <WorkCard
+                    key={work.title}
+                    item={work}
+                    open={active === index}
+                    onOpen={() => setActive(index)}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {mounted && item
+        ? createPortal(
+            <WorkDialog item={item} onClose={() => setActive(null)} />,
+            document.body,
+          )
+        : null}
     </section>
   );
 }
 
-function ShowcaseCard({ item, index }: { item: ShowcaseItem; index: number }) {
+function WorkCard({
+  item,
+  open,
+  onOpen,
+}: {
+  item: ShowcaseItem;
+  open: boolean;
+  onOpen: () => void;
+}) {
   return (
-    <article className={`${styles.card} group/card`}>
-      <div className={styles.frame}>
-        <div className={styles.zoom}>
-          <div className={styles.parallax} data-parallax>
-            <Artwork
-              variant={item.art}
-              tone={item.tone}
-              className="h-full w-full origin-center transition-transform duration-[900ms] ease-expo group-hover/card:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover/card:scale-100"
+    <article className={styles.card} data-open={open ? "true" : undefined}>
+      <button type="button" className={styles.open} onClick={onOpen}>
+        <span className={styles.frame}>
+          <WorkVisual item={item} />
+          <span className={styles.shine} aria-hidden="true" />
+          <span className={styles.view}>View Project</span>
+        </span>
+        <span className="sr-only">{item.title}</span>
+      </button>
+      <div className={styles.caption}>
+        <h3 className={styles.cardTitle}>{item.title}</h3>
+        <p className={`t-label ${styles.cardMeta}`}>
+          <span
+            aria-hidden="true"
+            className="sq"
+            style={{ "--sq": markerHex[item.color], width: 8, height: 8 } as CSSProperties}
+          />
+          {item.discipline}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function WorkVisual({ item }: { item: ShowcaseItem }) {
+  if (item.image) {
+    return <img src={item.image} alt="" className={styles.photo} />;
+  }
+  return <Artwork variant={item.art} tone={item.tone} className="h-full w-full" />;
+}
+
+function WorkDialog({ item, onClose }: { item: ShowcaseItem; onClose: () => void }) {
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    setScrollLocked(true);
+    closeRef.current?.focus();
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const nodes = [...panelRef.current.querySelectorAll<HTMLElement>("a, button")].filter(
+        (node) => !node.hasAttribute("disabled"),
+      );
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      setScrollLocked(false);
+      previous?.focus();
+    };
+  }, []);
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className={styles.dialog}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button ref={closeRef} type="button" className={styles.close} onClick={onClose}>
+          Close
+        </button>
+        <div className={styles.body} data-lenis-prevent>
+          <div className={styles.shot}>
+            <WorkVisual item={item} />
+          </div>
+          <p className={`t-label ${styles.dialogLabel}`}>
+            <span
+              aria-hidden="true"
+              className="sq"
+              style={{ "--sq": markerHex[item.color], width: 8, height: 8 } as CSSProperties}
             />
+            {item.discipline}
+          </p>
+          <h2 id={titleId} className={`t-h3 ${styles.dialogTitle}`}>
+            {item.title}
+          </h2>
+          <p className={`t-body text-fg-2 ${styles.blurb}`}>{item.blurb}</p>
+          <div
+            className={styles.blocks}
+            onClick={(event) => {
+              if ((event.target as HTMLElement).closest("a")) onClose();
+            }}
+          >
+            {item.blocks.map((block, index) =>
+              block.kind === "text" ? (
+                <p key={index} className="t-body text-pretty text-fg-2">
+                  {block.text}
+                </p>
+              ) : (
+                <Button key={index} href={block.href} variant="primary" size="md">
+                  {block.label}
+                </Button>
+              ),
+            )}
           </div>
         </div>
       </div>
-      <div className="mt-4 flex items-baseline justify-between gap-3">
-        <span className="t-label inline-flex min-w-0 items-center gap-2.5 text-fg-2">
-          <span
-            className="sq shrink-0"
-            style={{ "--sq": markerHex[item.color] } as CSSProperties}
-          />
-          <span className="min-w-0">{item.discipline}</span>
-        </span>
-        <span className="t-label shrink-0 text-fg-3 tabular-nums">{pad2(index + 1)}</span>
-      </div>
-      <h3 className="t-h3 mt-[14px]">{item.title}</h3>
-      <p className="t-small mt-2 max-w-[34ch] text-fg-2">{item.blurb}</p>
-    </article>
+    </div>
   );
 }

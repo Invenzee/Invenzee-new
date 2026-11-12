@@ -1,6 +1,7 @@
-/* Showcase rail
-   Desktop: a sticky stage inside a track whose height is set from JS.
-   Mobile and reduced motion: a native horizontal scroller. */
+/* Work rail
+   Desktop: a sticky stage, scrubbed sideways with the page scroll.
+   Mobile and reduced motion: the same rail scrolls natively.
+   The yard (bars + 10…100) rides with the cards. */
 
 .section {
   max-width: 100%;
@@ -14,169 +15,476 @@
 
 .stage {
   position: relative;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  padding-block: var(--sec);
-}
-
-.rail {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(40px, 6vw, 72px);
-  width: 100%;
-  min-width: 0;
-}
-
-.intro {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: var(--wrap);
-  margin-inline: auto;
-  padding-inline: var(--m);
-}
-
-.introFoot {
-  margin-top: auto;
-  padding-top: clamp(28px, 4vw, 56px);
-}
-
-.cards {
-  display: flex;
-  gap: clamp(16px, 3vw, 24px);
-  width: 100%;
   min-width: 0;
-  padding-inline: var(--m);
+  padding-top: calc(var(--nav-h) + 28px);
+  padding-bottom: 0;
+}
+
+.head {
+  container-type: inline-size;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.head :global(.t-h2) {
+  /* Sized so "Our Work" plus the mark runs the full width of the screen.
+     Pulled up so the caps sit on the top edge, not under the line box. */
+  margin: -0.21em 0 0;
+  font-size: 23.3cqw;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  text-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.head :global(.hw) {
+  padding: 0 0.06em 0.08em;
+  margin: 0 -0.06em;
+  overflow: visible;
+  line-height: 1;
+}
+
+.viewport {
+  --gap-a: 200px;
+  --gap-b: 300px;
+  --gap-c: 250px;
+  --lead: calc(var(--work-w, 100vw) * 0.7);
+  --card-w: calc((var(--work-w, 100vw) - var(--gap-a) - var(--gap-b)) / 3);
+  /* Eight cards, seven gaps between them, then one matching empty step. */
+  --content: calc(var(--card-w) * 8 + var(--gap-a) * 3 + var(--gap-b) * 2 + var(--gap-c) * 2);
+  --tail: calc(var(--content) / 7);
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  min-height: 460px;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--m);
-  overscroll-behavior-x: contain;
   scrollbar-width: none;
 }
 
-.cards::-webkit-scrollbar {
+.viewport::-webkit-scrollbar {
   display: none;
+}
+
+.rail {
+  position: relative;
+  display: flex;
+  width: max-content;
+  height: 100%;
+  min-height: 460px;
+}
+
+.yard {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* Starts at the first card and runs through the extra scroll past the last one. */
+  left: var(--lead);
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+}
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 50vh;
+  max-height: 50vh;
+  background: rgb(255 255 255 / 0.22);
+}
+
+/* Three equal ticks between the numbers. They sit on the bottom edge. */
+.tick {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 12vh;
+  max-height: 50vh;
+  background: rgb(255 255 255 / 0.22);
+}
+
+.num {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-50%);
+  color: rgb(255 255 255 / 0.22);
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 8vw, 7.5rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.mark:first-child .num {
+  transform: none;
+}
+
+.mark:last-child .num {
+  transform: translateX(-100%);
+}
+
+.cards {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  width: max-content;
+  align-items: center;
+  height: 100%;
+  gap: 0;
+  /* First card begins 70% across the screen. The rest follow as you scroll. */
+  padding-left: var(--lead);
+  padding-right: var(--tail);
+  padding-bottom: clamp(72px, 14vh, 150px);
 }
 
 .card {
   flex: none;
-  width: min(78vw, 360px);
+  width: var(--card-w);
   margin: 0;
   scroll-snap-align: start;
 }
 
-.frame {
-  overflow: hidden;
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  aspect-ratio: 4 / 5;
+.card:nth-child(3n + 1) {
+  margin-right: var(--gap-a);
 }
 
-.zoom,
-.parallax {
-  height: 100%;
+.card:nth-child(3n + 2) {
+  margin-right: var(--gap-b);
+}
+
+.card:nth-child(3n) {
+  margin-right: var(--gap-c);
+}
+
+.card:last-child {
+  margin-right: 0;
+}
+
+.card[data-open="true"] .frame {
+  transform: rotateY(78deg) scale(0.96);
+  opacity: 0.35;
+}
+
+.open {
+  display: block;
   width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: inherit;
 }
 
-.progress {
-  display: none;
-}
-
-.meter {
+.frame {
   position: relative;
-  flex: 1;
-  min-width: 0;
-  height: 1px;
-  background: var(--line);
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  border: 1px solid rgb(255 255 255 / 0.28);
+  border-radius: 0;
+  background: var(--color-ink-2);
+  transform-style: preserve-3d;
+  transition:
+    border-color 0.4s var(--ease-expo),
+    transform 0.6s var(--ease-expo),
+    opacity 0.6s var(--ease-expo);
 }
 
-.meterFill {
+.frame > :first-child {
   position: absolute;
   inset: 0;
-  background: var(--color-cyan);
-  transform: scaleX(0);
-  transform-origin: left center;
+  width: 100%;
+  height: 100%;
 }
 
-/* Desktop scrub: only when there is room and the user allows motion. */
+.open:hover .frame,
+.open:focus-visible .frame {
+  border-color: rgb(255 255 255 / 0.85);
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shine {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgb(255 255 255 / 0.55) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%) skewX(-16deg);
+  pointer-events: none;
+}
+
+.open:hover .shine,
+.open:focus-visible .shine {
+  transform: translateX(130%) skewX(-16deg);
+  transition: transform 0.9s var(--ease-expo);
+}
+
+.view {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  padding: 0.7rem 1.15rem;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -42%);
+  transition:
+    opacity 0.35s var(--ease-expo),
+    transform 0.45s var(--ease-expo);
+  pointer-events: none;
+}
+
+.open:hover .view,
+.open:focus-visible .view {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.caption {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.cardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.cardMeta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em;
+  margin: 8px 0 0;
+  color: var(--fg-3);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(7 8 28 / 0.72);
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(880px, 100%);
+  max-height: min(86dvh, 920px);
+  padding: 18px 18px 8px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: var(--radius-sheet);
+  background: var(--color-ink);
+  color: #fff;
+  transform-origin: center center;
+  animation: work-flip 0.7s var(--ease-expo);
+}
+
+.body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 10px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.35) transparent;
+}
+
+.body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.28);
+  border-radius: 99px;
+}
+
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: var(--radius-control);
+  background: rgb(7 8 28 / 0.72);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.shot {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  background: var(--color-ink-2);
+}
+
+.shot > * {
+  width: 100%;
+  height: 100%;
+}
+
+.dialogLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 22px 0 0;
+  color: var(--fg-3);
+}
+
+.dialogTitle {
+  margin: 10px 0 0;
+}
+
+.blurb {
+  max-width: 58ch;
+  margin: 12px 0 0;
+}
+
+.blocks {
+  display: grid;
+  gap: 14px;
+  max-width: 62ch;
+  margin-top: 18px;
+}
+
+.blocks p {
+  margin: 0;
+}
+
+@keyframes work-flip {
+  from {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-72deg) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg) scale(1);
+  }
+}
+
+@media (hover: none) {
+  .view {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 1100px) {
+  .viewport {
+    --gap-a: clamp(28px, 8vw, 200px);
+    --gap-b: clamp(40px, 12vw, 300px);
+    --gap-c: clamp(32px, 10vw, 250px);
+  }
+}
+
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   .stage {
     position: sticky;
     top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     height: 100dvh;
     overflow: hidden;
-    /* Room for the fixed nav above and the progress line below. */
-    padding-top: calc(var(--nav-h) + 8px);
-    padding-bottom: 6.5rem;
+    padding-top: calc(var(--nav-h) + 16px);
+    padding-bottom: 0;
   }
 
+  .viewport,
   .rail {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: clamp(24px, 3vw, 56px);
-    padding-inline: var(--m);
+    min-height: 0;
   }
 
-  .intro {
-    flex: none;
-    align-self: stretch;
-    width: clamp(320px, 28vw, 480px);
-    max-width: none;
-    margin-inline: 0;
-    padding-inline: 0;
-  }
-
-  /* Slightly smaller than t-h2 so the heading fits the intro column. */
-  .intro :global(.t-h2) {
-    font-size: clamp(2.25rem, 1.3rem + 2.8vw, 4.25rem);
-  }
-
-  .cards {
-    display: contents;
+  .viewport {
+    overflow: hidden;
+    overflow-anchor: none;
+    scroll-snap-type: none;
   }
 
   .card {
-    /* 4/5 frame + caption must stay inside the stage, including short laptops. */
-    width: min(500px, max(300px, 28vw), calc((100dvh - var(--nav-h) - 21rem) * 0.8));
     scroll-snap-align: none;
-  }
-
-  .card:nth-child(odd) .frame {
-    aspect-ratio: 1 / 1;
-  }
-
-  .card:nth-child(even) .frame {
-    aspect-ratio: 4 / 5;
-  }
-
-  .zoom {
-    transform: scale(1.14);
-  }
-
-  .progress {
-    display: block;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    pointer-events: none;
   }
 }
 
-/* Leave the desktop media query: drop the JS height and transforms. */
 @media (max-width: 1023px), (prefers-reduced-motion: reduce) {
   .track {
     height: auto !important;
   }
 
-  .rail,
-  .parallax,
-  .zoom {
+  .rail {
     transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame,
+  .shine,
+  .view,
+  .dialog {
+    transition: none;
+    animation: none;
+  }
+
+  .open:hover .shine,
+  .open:focus-visible .shine {
+    transform: translateX(-130%) skewX(-16deg);
+  }
+
+  .card[data-open="true"] .frame {
+    transform: none;
+    opacity: 1;
   }
 }

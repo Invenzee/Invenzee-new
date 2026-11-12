@@ -1,7 +1,8 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { CurrentYear, LiveClock } from "@/components/ui/LiveClock";
 import { Logo } from "@/components/ui/Logo";
-import { contact, footer, markerHex, nav, services, site } from "@/content/site";
+import { ServiceIcon } from "@/components/ui/ServiceIcon";
+import { contact, footer, headingText, markerHex, nav, services, site } from "@/content/site";
 import { BackToTop } from "./footer/BackToTop";
 import { Wordmark } from "./footer/Wordmark";
 
@@ -46,18 +47,14 @@ export function Footer() {
                     href={`#${services.id}`}
                     className="group inline-flex max-w-full items-start gap-2.5"
                   >
-                    <span
-                      className="sq mt-1.5"
-                      style={
-                        {
-                          "--sq": markerHex[item.color],
-                          width: 8,
-                          height: 8,
-                        } as CSSProperties
-                      }
+                    <ServiceIcon
+                      id={item.id}
+                      color={markerHex[item.color]}
+                      size={13}
+                      className="mt-0.5"
                     />
                     <span className={linkText}>
-                      {item.title}
+                      {headingText(item.title)}
                       <Underline />
                     </span>
                   </a>

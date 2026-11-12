@@ -72,19 +72,28 @@ export function CursorTrail() {
     const active = nodes.map(() => false);
     const from = nodes.map(() => ({ x: 0, y: 0 }));
     const to = nodes.map(() => ({ x: 0, y: 0 }));
+    const fit = nodes.map(() => 1);
     const timers = new Set<number>();
     let slot = 0;
     let lastX = -999;
     let lastY = -999;
     let frame = 0;
 
-    const spawn = (x: number, y: number, now: number, originX = x, originY = y) => {
+    const spawn = (
+      x: number,
+      y: number,
+      now: number,
+      originX = x,
+      originY = y,
+      scaleFit = 1,
+    ) => {
       const index = slot % nodes.length;
       slot += 1;
       const node = nodes[index];
       paint(node, KINDS[index % KINDS.length]);
       born[index] = now;
       active[index] = true;
+      fit[index] = scaleFit;
       from[index].x = originX;
       from[index].y = originY;
       to[index].x = x;
@@ -123,9 +132,12 @@ export function CursorTrail() {
       dot.removeAttribute("data-burst");
       void dot.offsetWidth;
       dot.setAttribute("data-burst", "");
+      /* Smaller squares throw a tighter, smaller burst. The hero square stays full size. */
+      const reach = Math.max(box.width, box.height) / 64;
+      const scaleFit = Math.min(1, Math.max(0.42, reach));
       for (let i = 0; i < BURST; i += 1) {
         const angle = (Math.PI * 2 * i) / BURST;
-        const dist = i % 2 === 0 ? 96 : 156;
+        const dist = (i % 2 === 0 ? 96 : 156) * reach;
         later(() => {
           spawn(
             ox + Math.cos(angle) * dist,
@@ -133,6 +145,7 @@ export function CursorTrail() {
             performance.now(),
             ox,
             oy,
+            scaleFit,
           );
         }, (i % 4) * 30);
       }
@@ -154,7 +167,7 @@ export function CursorTrail() {
         const ease = 1 - (1 - travel) * (1 - travel);
         const px = from[index].x + (to[index].x - from[index].x) * ease;
         const py = from[index].y + (to[index].y - from[index].y) * ease;
-        const scale = age < 0.14 ? age / 0.14 : 1 - (age - 0.14) / 0.86;
+        const scale = (age < 0.14 ? age / 0.14 : 1 - (age - 0.14) / 0.86) * fit[index];
         node.style.transform = `translate3d(${px}px, ${py}px, 0) translate(-50%, -50%) scale(${scale})`;
         node.style.opacity = "1";
       });

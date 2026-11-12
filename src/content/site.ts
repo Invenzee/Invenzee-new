@@ -7,6 +7,11 @@
  *  `{ accent }` is set in the italic accent serif (1–2 words per heading). */
 export type HeadingPart = string | { accent: string };
 
+/** Plain-text reading of a heading, for captions, links, and form values. */
+export function headingText(parts: readonly HeadingPart[]): string {
+  return parts.map((part) => (typeof part === "string" ? part : part.accent)).join("");
+}
+
 export type ArtVariant =
   | "brand"
   | "web"
@@ -124,7 +129,7 @@ export const about = {
 
 export type Service = {
   id: string;
-  title: string;
+  title: HeadingPart[];
   color: MarkerColor;
   summary: string;
   items: string[];
@@ -141,7 +146,7 @@ export const services = {
   list: [
     {
       id: "marketing",
-      title: "Digital marketing",
+      title: ["Digital ", { accent: "Marketing" }] satisfies HeadingPart[],
       color: "lime",
       summary:
         "Strategy and campaigns that put your brand in front of the right people, measured against real results.",
@@ -158,7 +163,7 @@ export const services = {
     },
     {
       id: "design",
-      title: "Graphic design & branding",
+      title: ["Graphic ", { accent: "Design" }] satisfies HeadingPart[],
       color: "coral",
       summary:
         "A distinctive identity and a visual language that holds together on every screen and every print.",
@@ -175,7 +180,7 @@ export const services = {
     },
     {
       id: "web",
-      title: "Website development",
+      title: ["Website ", { accent: "Development" }] satisfies HeadingPart[],
       color: "cyan",
       summary:
         "Fast, responsive websites and online stores, designed to convert and easy for your team to manage.",
@@ -192,7 +197,7 @@ export const services = {
     },
     {
       id: "software",
-      title: "Software development",
+      title: ["Software ", { accent: "Development" }] satisfies HeadingPart[],
       color: "violet",
       summary:
         "Custom software, web apps and mobile apps that fit the way your business actually works.",
@@ -209,7 +214,7 @@ export const services = {
     },
     {
       id: "video",
-      title: "Video editing & motion",
+      title: ["Video ", { accent: "Editing" } , " & Motion"] satisfies HeadingPart[],
       color: "amber",
       summary:
         "Edits, reels and motion graphics that hold attention from the first second to the last frame.",
@@ -226,7 +231,7 @@ export const services = {
     },
     {
       id: "illustration",
-      title: "Illustration",
+      title: ["Illustration"],
       color: "pink",
       summary:
         "Original illustration that gives your brand a look nobody else has.",
@@ -244,6 +249,11 @@ export const services = {
   ] satisfies Service[],
 };
 
+/** A block inside a work dialog. Add as many as you need, in any order. */
+export type WorkBlock =
+  | { kind: "text"; text: string }
+  | { kind: "button"; label: string; href: string };
+
 export type ShowcaseItem = {
   title: string;
   discipline: string;
@@ -251,18 +261,18 @@ export type ShowcaseItem = {
   blurb: string;
   art: ArtVariant;
   tone: ArtTone;
+  /** Real photo. When omitted, the card and the dialog use the artwork. */
+  image?: string;
+  blocks: WorkBlock[];
 };
 
 /* TODO(invenzee): replace these capability cards with real case studies
-   (client name, real screenshot/photo, result) once project assets are ready. */
+   (client name, real screenshot/photo, result) once project assets are ready.
+   Drop a photo path on `image`, and keep adding `blocks` for the dialog. */
 export const showcase = {
   id: "work",
   label: "What we make",
-  heading: [
-    "A taste of what ",
-    "we ",
-    { accent: "make" },
-  ] satisfies HeadingPart[],
+  heading: [" ", { accent: "Our Work" }] satisfies HeadingPart[],
   intro:
     "From a logo sketch to a shipped product: the range we cover without leaving the building.",
   link: { label: "Start a project", href: "#contact" },
@@ -274,6 +284,17 @@ export const showcase = {
       blurb: "Marks, palettes and guidelines built to be recognised at a glance.",
       art: "brand",
       tone: "navy",
+      blocks: [
+        {
+          kind: "text",
+          text: "A mark is only the start. We build the palette, the type and the rules that keep a brand looking like itself on a website, a reel and a printed box.",
+        },
+        {
+          kind: "text",
+          text: "You leave with a logo, a short guideline and a set of templates your team can actually use.",
+        },
+        { kind: "button", label: "Start a project", href: "#contact" },
+      ],
     },
     {
       title: "E-commerce stores",
@@ -282,6 +303,17 @@ export const showcase = {
       blurb: "Storefronts that load fast, look sharp and make checkout easy.",
       art: "web",
       tone: "ink",
+      blocks: [
+        {
+          kind: "text",
+          text: "We design the shop around the way people actually buy: clear products, a short path to checkout, and pages that stay fast on a phone.",
+        },
+        {
+          kind: "text",
+          text: "The store is yours to run. We set up the catalogue, payments and the basics of hosting, then hand it over with a walkthrough.",
+        },
+        { kind: "button", label: "Launch your website", href: "#contact" },
+      ],
     },
     {
       title: "Search & paid campaigns",
@@ -290,6 +322,17 @@ export const showcase = {
       blurb: "SEO and PPC run together, so every click has a job to do.",
       art: "growth",
       tone: "paper",
+      blocks: [
+        {
+          kind: "text",
+          text: "Search and ads are planned as one system. The pages we improve are the pages the ads send people to, so the spend and the content pull the same way.",
+        },
+        {
+          kind: "text",
+          text: "You get a plain report: what was spent, what came back, and what we change next month.",
+        },
+        { kind: "button", label: "Grow your audience", href: "#contact" },
+      ],
     },
     {
       title: "Mobile & web apps",
@@ -298,6 +341,17 @@ export const showcase = {
       blurb: "Products shaped around your workflow, from prototype to release.",
       art: "app",
       tone: "cyan",
+      blocks: [
+        {
+          kind: "text",
+          text: "We start from the job the software has to do, then prototype the flow before a line of production code. You see the product while it is still cheap to change.",
+        },
+        {
+          kind: "text",
+          text: "Web apps, mobile apps and the APIs between them ship from the same team, so the pieces fit.",
+        },
+        { kind: "button", label: "Build your product", href: "#contact" },
+      ],
     },
     {
       title: "Reels & explainers",
@@ -306,6 +360,17 @@ export const showcase = {
       blurb: "Short-form edits and motion graphics made for the scroll.",
       art: "motion",
       tone: "navy",
+      blocks: [
+        {
+          kind: "text",
+          text: "A reel has a few seconds to earn the next second. We cut for that, then build motion graphics that explain the offer without a voiceover doing all the work.",
+        },
+        {
+          kind: "text",
+          text: "Delivered in the sizes your channels need, from a vertical cut to a longer explainer.",
+        },
+        { kind: "button", label: "Tell your story", href: "#contact" },
+      ],
     },
     {
       title: "Custom illustration",
@@ -314,6 +379,17 @@ export const showcase = {
       blurb: "Characters, icons and editorial artwork drawn for your brand only.",
       art: "illustration",
       tone: "paper",
+      blocks: [
+        {
+          kind: "text",
+          text: "Illustration gives a brand a face that stock art cannot. We draw characters, icons and editorial pieces that belong to you and no one else.",
+        },
+        {
+          kind: "text",
+          text: "The same hand can carry a set across a site, a deck and a social series, so the pictures agree with each other.",
+        },
+        { kind: "button", label: "Draw your world", href: "#contact" },
+      ],
     },
     {
       title: "Social media content",
@@ -322,6 +398,17 @@ export const showcase = {
       blurb: "Calendars, creatives and captions that keep your feed alive.",
       art: "brand",
       tone: "cyan",
+      blocks: [
+        {
+          kind: "text",
+          text: "A feed dies when every post starts from zero. We build a calendar, a set of layouts and captions that your team can keep going after the first month.",
+        },
+        {
+          kind: "text",
+          text: "Design, copy and the cut of a short video come from one team, so the week looks planned.",
+        },
+        { kind: "button", label: "Plan your feed", href: "#contact" },
+      ],
     },
     {
       title: "Business dashboards",
@@ -330,6 +417,17 @@ export const showcase = {
       blurb: "Your numbers in one place, built on the tools you already use.",
       art: "growth",
       tone: "ink",
+      blocks: [
+        {
+          kind: "text",
+          text: "The numbers you already collect, pulled into one view. We connect the tools you use and show the few figures that change a decision.",
+        },
+        {
+          kind: "text",
+          text: "No new system to learn for its own sake. The dashboard sits on top of the stack you have.",
+        },
+        { kind: "button", label: "See your numbers", href: "#contact" },
+      ],
     },
   ] satisfies ShowcaseItem[],
 };

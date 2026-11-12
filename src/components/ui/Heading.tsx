@@ -69,7 +69,15 @@ export function Heading({
     >
       <span aria-hidden="true">
         {nodes}
-        {dot && <span className="dot" style={{ "--i": i } as CSSProperties} />}
+        {dot && (
+          <button
+            type="button"
+            className="dot"
+            data-anim="dot"
+            aria-label="Pop the mark"
+            style={{ "--i": i } as CSSProperties}
+          />
+        )}
       </span>
     </Tag>
   );

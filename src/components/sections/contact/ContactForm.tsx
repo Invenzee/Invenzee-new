@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { ArrowIcon } from "@/components/ui/Button";
-import { contact, services, site } from "@/content/site";
+import { contact, headingText, services, site } from "@/content/site";
 import styles from "./ContactForm.module.css";
 
 const controlClass = `${styles.control} w-full min-w-0 appearance-none bg-transparent py-[14px] font-display text-[1.25rem] leading-[1.15] font-medium tracking-[-0.02em] text-fg placeholder:text-fg-3`;
@@ -109,8 +109,8 @@ export function ContactForm() {
             {contact.form.serviceFallback}
           </option>
           {services.list.map((item) => (
-            <option key={item.id} value={item.title}>
-              {item.title}
+            <option key={item.id} value={headingText(item.title)}>
+              {headingText(item.title)}
             </option>
           ))}
         </select>

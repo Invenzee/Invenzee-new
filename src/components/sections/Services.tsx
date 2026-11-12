@@ -1,168 +1,221 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useState } from "react";
-import { markerHex, services, type Service } from "@/content/site";
-import { ArrowIcon, ArrowLink } from "@/components/ui/Button";
+import { useEffect, useRef, useState } from "react";
+import { headingText, markerHex, services } from "@/content/site";
 import { Artwork } from "@/components/ui/Artwork";
+import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
 import { Reveal } from "@/components/ui/Reveal";
+import { ServiceIcon } from "@/components/ui/ServiceIcon";
+import { ScrollTrigger, useGSAP } from "@/lib/gsap";
 import styles from "./Services.module.css";
 
-const COLS =
-  "grid-cols-[12px_2rem_minmax(0,1fr)_2.5rem] gap-x-3 sm:gap-x-4";
+const count = services.list.length;
+const LINES_PER_SERVICE = 4; // 2 spokes (hub -> arc) + 2 horizontals (arc -> card)
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-function ServiceRow({
-  service,
-  index,
-  open,
-  onOpen,
-}: {
-  service: Service;
-  index: number;
-  open: boolean;
-  onOpen: () => void;
-}) {
-  const titleId = `service-title-${service.id}`;
-  const panelId = `service-panel-${service.id}`;
-  const marker = {
-    "--sq": markerHex[service.color],
-    width: 12,
-    height: 12,
-  } as CSSProperties;
+/** Adds a short rest on each service: 0..count-1 with plateaus at whole numbers. */
+function hold(raw: number) {
+  const i = Math.floor(raw);
+  const f = raw - i;
+  const t = Math.min(1, Math.max(0, (f - 0.2) / 0.6));
+  const s = t * t * (3 - 2 * t);
+  return Math.min(count - 1, i + s);
+}
+
+function ServiceCopy({ index }: { index: number }) {
+  const service = services.list[index];
+  if (!service) return null;
 
   return (
-    <Reveal
-      as="li"
-      delay={index * 60}
-      className="border-t border-line last:border-b"
-    >
-      <h3 className="m-0 leading-none">
-        <button
-          type="button"
-          className={`group/row grid w-full items-center bg-transparent py-[clamp(20px,2vw,30px)] text-left ${COLS}`}
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => {
-            if (!open) onOpen();
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className={`sq shrink-0 transition-transform duration-500 ease-expo motion-reduce:transition-none ${
-              open ? "rotate-45" : "rotate-0"
-            }`}
-            style={marker}
-          />
-          <span className="t-label w-full text-fg-3 tabular-nums" aria-hidden="true">
-            {pad(index + 1)}
-          </span>
-          <span
-            id={titleId}
-            className={`t-h3 min-w-0 text-balance transition-colors duration-500 ease-expo motion-reduce:transition-none ${
-              open
-                ? "text-fg"
-                : "text-fg-3 group-hover/row:text-fg group-focus-visible/row:text-fg"
-            }`}
-          >
-            {service.title}
-          </span>
-          <span
-            aria-hidden="true"
-            className={`grid size-10 shrink-0 place-items-center mark-tile border transition-colors duration-500 ease-expo motion-reduce:transition-none ${
-              open
-                ? "border-transparent bg-cyan text-navy"
-                : "border-line-2 bg-transparent text-fg"
-            }`}
-          >
-            <svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true">
-              <path
-                d="M2 7h10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M7 2v10"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                className={`${styles.tick} ${open ? styles.tickOff : ""}`}
-              />
-            </svg>
-          </span>
-        </button>
+    <div className={styles.copyBody}>
+      <p className={`t-label ${styles.index}`}>
+        <ServiceIcon id={service.id} color={markerHex[service.color]} size={14} />
+        <span className="tabular-nums">{pad(index + 1)}</span>
+      </p>
+      <h3 className={styles.title}>
+        {service.title.map((part, partIndex) =>
+          typeof part === "string" ? (
+            <span key={partIndex}>{part}</span>
+          ) : (
+            <span key={partIndex} className="accent">
+              {part.accent}
+            </span>
+          ),
+        )}
       </h3>
-
-      <div
-        id={panelId}
-        role="region"
-        aria-labelledby={titleId}
-        inert={open ? undefined : true}
-        className={`grid transition-[grid-template-rows] duration-[600ms] ease-expo motion-reduce:transition-none ${
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        }`}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div
-            className={`transition-opacity duration-500 ease-expo motion-reduce:transition-none ${
-              open ? "opacity-100 delay-100" : "opacity-0 delay-0"
-            }`}
-          >
-            <div className={`grid ${COLS}`}>
-              <div className="col-span-2 col-start-3 min-w-0 pb-8">
-                <div
-                  aria-hidden="true"
-                  className="relative mb-6 aspect-[16/10] overflow-hidden rounded-card bg-surface lg:hidden"
-                >
-                  <Artwork
-                    variant={service.art}
-                    tone={service.tone}
-                    className="absolute inset-0"
-                  />
-                </div>
-                <p className="t-body max-w-[48ch] text-pretty text-fg-2">
-                  {service.summary}
-                </p>
-                <ul className="mt-5 flex list-none flex-wrap items-baseline p-0 font-display text-[clamp(1.125rem,1.05rem+0.3vw,1.25rem)] leading-snug font-medium tracking-[-0.015em] text-fg">
-                  {service.items.map((item, itemIndex) => (
-                    <li key={item} className="inline-flex items-baseline">
-                      <span>{item}</span>
-                      {itemIndex < service.items.length - 1 ? (
-                        <span aria-hidden="true" className="px-[0.55em] text-signal">
-                          /
-                        </span>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-                <ArrowLink href="#contact" className="mt-6">
-                  {service.cta}
-                </ArrowLink>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Reveal>
+      <p className={`t-body text-pretty text-fg-2 ${styles.summary}`}>{service.summary}</p>
+      <ul className={`text-fg ${styles.items}`}>
+        {service.items.map((item, itemIndex) => (
+          <li key={item} className="inline-flex items-baseline">
+            <span>{item}</span>
+            {itemIndex < service.items.length - 1 ? (
+              <span aria-hidden="true" className="px-[0.55em] text-signal">
+                /
+              </span>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+      <Button href="#contact" variant="primary" size="md" className="mt-7">
+        {service.cta}
+      </Button>
+    </div>
   );
 }
 
 export function Services() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const arcRef = useRef<SVGCircleElement>(null);
+  const hubRef = useRef<SVGCircleElement>(null);
+  const lineRefs = useRef<(SVGLineElement | null)[]>([]);
+  const copyRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const progressRef = useRef(0);
   const [active, setActive] = useState(0);
-  const current = services.list[active] ?? services.list[0];
-  const total = services.list.length;
+  const [reduce, setReduce] = useState(false);
+
+  /** position = continuous scroll position, 0 .. count - 1 */
+  const draw = (position: number) => {
+    const stage = stageRef.current;
+    const svg = svgRef.current;
+    const arc = arcRef.current;
+    const hub = hubRef.current;
+    if (!stage || !svg || !arc || !hub) return;
+
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    const compact = width < 1024;
+    const stageBox = stage.getBoundingClientRect();
+
+    // Small circle: centre on the left edge, so only the right half shows.
+    const hubR = compact ? 17 : 34;
+    const hubX = 0;
+    const hubY = height / 2;
+
+    // Big circle: crosses x = 0 exactly at the top and bottom of the screen.
+    const half = height / 2;
+    const bulge = hubR + (compact ? 36 : Math.min(110, width * 0.08)); // furthest-right point of the arc
+    const radius = (bulge * bulge + half * half) / (2 * bulge);
+    const centerX = bulge - radius;
+
+    const copyLeft = bulge + 24;
+    const gap = compact ? 15 : 22;
+    const spacing = height; // one full screen per service, so only one is ever visible
+
+    // Horizontal lines end where the copy ends and the card starts.
+    const card = stage.querySelector<HTMLElement>(`.${styles.card}`);
+    const endX = !compact && card ? card.getBoundingClientRect().left - stageBox.left : width;
+
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    arc.setAttribute("cx", String(centerX));
+    arc.setAttribute("cy", String(hubY));
+    arc.setAttribute("r", String(radius));
+    hub.setAttribute("cx", String(hubX));
+    hub.setAttribute("cy", String(hubY));
+    hub.setAttribute("r", String(hubR));
+
+    // x of the circle's right side at a given y.
+    const arcX = (y: number) => {
+      const dy = Math.min(radius - 1, Math.abs(y - hubY));
+      return centerX + Math.sqrt(radius * radius - dy * dy);
+    };
+
+    for (let i = 0; i < count; i++) {
+      const copy = copyRefs.current[i];
+      const d = i - position;
+      const visible = Math.abs(d) < 1;
+
+      const lines = [0, 1, 2, 3].map((n) => lineRefs.current[i * LINES_PER_SERVICE + n]);
+      lines.forEach((node) => node?.setAttribute("visibility", visible ? "visible" : "hidden"));
+
+      if (copy) copy.style.visibility = visible ? "visible" : "hidden";
+      if (!visible || !copy) continue;
+
+      // Ride the circle: slide by dy and pull left by how far the arc curves back.
+      const dy = d * spacing;
+      const dx = Math.sqrt(Math.max(0, radius * radius - dy * dy)) - radius;
+
+      copy.style.width = `${compact ? Math.max(180, width - copyLeft - 16) : Math.max(280, Math.min(544, endX - copyLeft - 24))}px`;
+      const h = copy.offsetHeight;
+      const top = hubY + dy - h * 0.42;
+      copy.style.transform = `translate3d(${copyLeft + dx}px, ${top}px, 0)`;
+
+      const topY = top - gap;
+      const bottomY = top + h + gap;
+      const topX = arcX(topY);
+      const bottomX = arcX(bottomY);
+
+      const segments = [
+        { x1: hubX, y1: hubY, x2: topX, y2: topY }, // hub -> upper arc point
+        { x1: hubX, y1: hubY, x2: bottomX, y2: bottomY }, // hub -> lower arc point
+        { x1: topX, y1: topY, x2: endX, y2: topY }, // upper horizontal
+        { x1: bottomX, y1: bottomY, x2: endX, y2: bottomY }, // lower horizontal
+      ];
+
+      segments.forEach((s, n) => {
+        const node = lines[n];
+        if (!node) return;
+        node.setAttribute("x1", String(s.x1));
+        node.setAttribute("y1", String(s.y1));
+        node.setAttribute("x2", String(s.x2));
+        node.setAttribute("y2", String(s.y2));
+      });
+    }
+  };
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduce(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    draw(progressRef.current);
+    const raf = requestAnimationFrame(() => draw(progressRef.current));
+    const stage = stageRef.current;
+    if (!stage) return () => cancelAnimationFrame(raf);
+    const observer = new ResizeObserver(() => draw(progressRef.current));
+    observer.observe(stage);
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
+
+  useGSAP(() => {
+    const track = trackRef.current;
+    if (!track || reduce) return;
+
+    const trigger = ScrollTrigger.create({
+      trigger: track,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: 0.4,
+      onUpdate: (self) => {
+        const position = hold(self.progress * (count - 1));
+        progressRef.current = position;
+        draw(position);
+        const index = Math.min(count - 1, Math.round(position));
+        setActive((current) => (current === index ? current : index));
+      },
+    });
+
+    return () => trigger.kill();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
   return (
     <section id={services.id} className="theme-dark">
-      <div className="wrap sec">
+      <div className={`wrap sec ${styles.intro}`}>
         <div className="grid-12 items-end gap-y-8">
           <div className="col-span-12 min-w-0 lg:col-span-7">
             <Label>{services.label}</Label>
@@ -172,126 +225,88 @@ export function Services() {
             <p className="t-lead text-pretty text-fg-2">{services.intro}</p>
           </Reveal>
         </div>
+      </div>
 
-        <div className="mt-[clamp(40px,5vw,80px)] grid-12 items-start">
-          <div className="col-span-12 min-w-0 lg:col-span-7">
-            <ul className="m-0 list-none p-0">
-              {services.list.map((service, index) => (
-                <ServiceRow
-                  key={service.id}
-                  service={service}
-                  index={index}
-                  open={index === active}
-                  onOpen={() => setActive(index)}
+      {reduce ? (
+        <div className={`wrap ${styles.stack}`}>
+          {services.list.map((service, index) => (
+            <article key={service.id} className={styles.stackItem}>
+              <ServiceCopy index={index} />
+              <ServiceCard index={index} />
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div ref={trackRef} className={styles.track} style={{ height: `${count * 100}vh` }}>
+          <div ref={stageRef} className={styles.stage}>
+            <svg ref={svgRef} className={styles.orbit} aria-hidden="true">
+              <circle ref={arcRef} className={styles.arc} />
+              {Array.from({ length: count * LINES_PER_SERVICE }, (_, line) => (
+                <line
+                  key={line}
+                  ref={(node) => {
+                    lineRefs.current[line] = node;
+                  }}
+                  className={styles.ray}
                 />
               ))}
-            </ul>
-          </div>
+              <circle ref={hubRef} className={styles.hub} r="34" />
+            </svg>
 
-          {current ? (
-            <div className="col-span-12 hidden min-w-0 lg:col-span-4 lg:col-start-9 lg:block">
-              <div className="sticky top-[calc(var(--nav-h)+24px)]">
-                <Reveal delay={80}>
-                  <div className={styles.frame}>
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-card bg-surface">
-                      {services.list.map((service, index) => {
-                        const on = index === active;
-                        return (
-                          <div
-                            key={service.id}
-                            aria-hidden="true"
-                            className={`absolute inset-0 origin-center transition-[opacity,transform] duration-700 ease-expo motion-reduce:transition-none ${
-                              on
-                                ? "z-[2] scale-100 opacity-100"
-                                : "z-[1] scale-[1.08] opacity-0"
-                            }`}
-                          >
-                            <Artwork
-                              variant={service.art}
-                              tone={service.tone}
-                              className="absolute inset-0"
-                            />
-                          </div>
-                        );
-                      })}
-
-                      <a
-                        href="#contact"
-                        aria-label={`Start a ${current.title} project`}
-                        className="group/go absolute top-4 right-4 z-20 grid size-11 place-items-center mark-tile bg-white text-navy"
-                      >
-                        <ArrowIcon className="-rotate-45 transition-transform duration-500 ease-expo group-hover/go:rotate-0 group-focus-visible/go:rotate-0 motion-reduce:transition-none" />
-                      </a>
-
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-ink from-20% via-ink/55 to-transparent px-5 pt-20 pb-5">
-                        <div
-                          key={current.id}
-                          className={`${styles.caption} flex items-end justify-between gap-4`}
-                        >
-                          <span className="t-label flex min-w-0 items-center gap-2.5 text-fg">
-                            <span
-                              className="sq shrink-0"
-                              style={
-                                { "--sq": markerHex[current.color] } as CSSProperties
-                              }
-                            />
-                            <span className="min-w-0">{current.title}</span>
-                          </span>
-                          <span className="t-label shrink-0 text-fg tabular-nums whitespace-nowrap">
-                            {pad(active + 1)}
-                            <span aria-hidden="true" className="px-[0.45em] text-signal">
-                              /
-                            </span>
-                            {pad(total)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Reveal>
-
-                <Reveal delay={180}>
-                  <div
-                    className="mt-4 flex items-center gap-1"
-                    role="group"
-                    aria-label={services.label}
-                  >
-                    {services.list.map((service, index) => {
-                      const on = index === active;
-                      return (
-                        <button
-                          key={service.id}
-                          type="button"
-                          aria-pressed={on}
-                          aria-label={service.title}
-                          onClick={() => setActive(index)}
-                          className={`grid size-8 place-items-center mark-tile transition-opacity duration-300 ease-expo motion-reduce:transition-none ${
-                            on
-                              ? "opacity-100 ring-1 ring-line-2 ring-inset"
-                              : "opacity-50 hover:opacity-100 focus-visible:opacity-100"
-                          }`}
-                        >
-                          <span
-                            aria-hidden="true"
-                            className="sq"
-                            style={
-                              {
-                                "--sq": markerHex[service.color],
-                                width: 12,
-                                height: 12,
-                              } as CSSProperties
-                            }
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </Reveal>
+            {services.list.map((service, index) => (
+              <div
+                key={service.id}
+                ref={(node) => {
+                  copyRefs.current[index] = node;
+                }}
+                className={styles.copyItem}
+                aria-hidden={index === active ? undefined : true}
+              >
+                <ServiceCopy index={index} />
               </div>
+            ))}
+
+            <div className={`wrap ${styles.stageInner}`}>
+              <ServiceCard index={active} stacked />
             </div>
-          ) : null}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ServiceCard({ index, stacked = false }: { index: number; stacked?: boolean }) {
+  const service = services.list[index];
+  if (!service) return null;
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.cardFrame}>
+        {stacked ? (
+          services.list.map((item, itemIndex) => (
+            <div
+              key={item.id}
+              aria-hidden="true"
+              className={`${styles.art} ${itemIndex === index ? styles.artOn : styles.artOff}`}
+            >
+              <Artwork variant={item.art} tone={item.tone} className="absolute inset-0" />
+            </div>
+          ))
+        ) : (
+          <Artwork variant={service.art} tone={service.tone} className="absolute inset-0" />
+        )}
+        <div className={styles.caption}>
+          <span className="t-label">{headingText(service.title)}</span>
+          <span className="t-label tabular-nums">
+            {pad(index + 1)}
+            <span aria-hidden="true" className="px-[0.45em] text-signal">
+              /
+            </span>
+            {pad(count)}
+          </span>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

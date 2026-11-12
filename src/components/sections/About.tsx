@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useRef } from "react";
 import { about } from "@/content/site";
-import { ArrowLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Artwork } from "@/components/ui/Artwork";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
@@ -105,7 +105,9 @@ export function About() {
               </p>
             </Reveal>
             <Reveal delay={160} className="mt-8">
-              <ArrowLink href={about.link.href}>{about.link.label}</ArrowLink>
+              <Button href={about.link.href} variant="primary" size="md">
+                {about.link.label}
+              </Button>
             </Reveal>
           </div>
 

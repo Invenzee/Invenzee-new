@@ -375,12 +375,30 @@ html.lenis body {
   transform: none;
 }
 .heading .dot {
+  padding: 0;
+  border: 0;
+  appearance: none;
   transform: scale(0) rotate(-90deg);
   transition: transform 0.8s var(--ease-expo);
   transition-delay: calc(var(--i, 0) * 45ms + 250ms + var(--reveal-delay, 0ms));
 }
 .heading.is-in .dot {
   transform: none;
+}
+.heading .dot[data-burst] {
+  animation: heading-dot-shrink 0.55s var(--ease-expo);
+}
+
+@keyframes heading-dot-shrink {
+  0% {
+    transform: scale(1);
+  }
+  32% {
+    transform: scale(0.7);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

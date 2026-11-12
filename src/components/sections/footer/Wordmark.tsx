@@ -26,7 +26,9 @@ export function Wordmark() {
                 {letter}
               </span>
             </span>
-            {index === 0 ? <span className={styles.dot} /> : null}
+            {index === 0 ? (
+              <button type="button" className={styles.dot} data-anim="dot" aria-label="Pop the mark" />
+            ) : null}
           </span>
         ))}
       </div>

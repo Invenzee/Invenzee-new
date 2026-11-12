@@ -65,11 +65,30 @@
   left: 50%;
   width: 0.17em;
   height: 0.17em;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius-mark);
+  appearance: none;
   background: var(--color-cyan);
   transform: translateX(-50%) scale(0);
   transform-origin: center;
   transition: transform 0.6s var(--ease-expo) 0.9s;
+}
+
+.dot[data-burst] {
+  animation: wordmark-dot-shrink 0.55s var(--ease-expo);
+}
+
+@keyframes wordmark-dot-shrink {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  32% {
+    transform: translateX(-50%) scale(0.7);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
 }
 
 .isIn .dot {
