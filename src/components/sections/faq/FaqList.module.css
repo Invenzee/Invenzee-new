@@ -1,0 +1,152 @@
+.list {
+    --wheel: 36px;
+    --wheel-top: 20px;
+    --rest: 30px; /* rope between the wheel centre and the bead when closed */
+    --bead: 16px;
+    --rail: 22px; /* rope centre, measured from the right edge */
+    position: relative;
+    isolation: isolate;
+  }
+  
+  .item {
+    display: block;
+  }
+  
+  .row {
+    position: relative;
+    color: var(--fg-2);
+  }
+  
+  /* No dividers. Spacing does the separating. */
+  .head {
+    display: flex;
+    width: 100%;
+    min-height: 96px; /* leaves room for the closed bead above the next wheel */
+    align-items: center;
+    border: 0;
+    background: transparent;
+    padding: clamp(18px, 1.8vw, 26px) 80px clamp(18px, 1.8vw, 26px) 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  /* ---------- the one rope ---------- */
+  
+  .rope {
+    position: absolute;
+    top: 0;
+    right: calc(var(--rail) - 1px);
+    bottom: 0;
+    z-index: 0;
+    width: 2px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--line-2) 0 6px,
+      transparent 6px 12px
+    );
+    /* Slides by exactly the rope's travel, the same number that turns the wheels. */
+    background-position: 0 var(--travel);
+  }
+  
+  /* ---------- wheels ---------- */
+  
+  .station {
+    position: absolute;
+    top: var(--wheel-top);
+    right: calc(var(--rail) - var(--wheel) / 2);
+    z-index: 2;
+    width: var(--wheel);
+    height: var(--wheel);
+    pointer-events: none;
+  }
+  
+  .wheel {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--bg, #fff);
+    color: var(--fg);
+    /* One --spin for the whole list, so every wheel turns as one. */
+    transform: rotate(var(--spin));
+    transition: color 300ms ease;
+    will-change: transform;
+  }
+  
+  .row[data-open="true"] .wheel {
+    color: var(--signal);
+  }
+  
+  /* ---------- pulled rope and bead ---------- */
+  
+  .taut {
+    position: absolute;
+    top: calc(var(--wheel-top) + var(--wheel) / 2);
+    right: calc(var(--rail) - 1px);
+    z-index: 1;
+    width: 2px;
+    height: calc(var(--rest) + var(--drop));
+    background: var(--fg-2);
+    transition: background-color 300ms ease;
+  }
+  
+  .row[data-open="true"] .taut {
+    background: var(--signal);
+  }
+  
+  .bead {
+    position: absolute;
+    top: calc(var(--wheel-top) + var(--wheel) / 2 + var(--rest) - var(--bead) / 2);
+    right: calc(var(--rail) - var(--bead) / 2);
+    z-index: 3;
+    width: var(--bead);
+    height: var(--bead);
+    padding: 0;
+    border: 2px solid var(--fg);
+    border-radius: 50%;
+    background: var(--bg, #fff);
+    cursor: grab;
+    translate: 0 var(--drop);
+    transform-origin: 50% -14px; /* swings from where it hangs on the rope */
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease;
+  }
+  
+  .bead:hover {
+    scale: 1.12;
+  }
+  
+  .bead:active {
+    cursor: grabbing;
+  }
+  
+  .row[data-open="true"] .bead {
+    border-color: var(--signal);
+    background: var(--signal);
+  }
+  
+  /* ---------- answer ---------- */
+  
+  /* Height is set from JS, so the rope is what pulls it open. */
+  .panel {
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .text {
+    max-width: 60ch;
+    margin: 0;
+    padding: 0 80px 28px 0;
+    color: var(--fg-2);
+    opacity: 0;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .wheel,
+    .taut,
+    .bead {
+      transition: none;
+    }
+  }

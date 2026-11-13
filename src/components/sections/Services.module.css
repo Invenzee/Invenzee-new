@@ -162,31 +162,46 @@
   gap: clamp(24px, 4vw, 72px);
 }
 
+.rideCard {
+  display: none;
+}
+
 @media (max-width: 1023px) {
   .stageInner {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: 18px;
-    padding-bottom: 20px;
+    display: none;
   }
 
-  .copy {
-    padding-left: var(--hub-x, 70px);
+  .rideCard {
+    display: block;
+    margin-bottom: 14px;
   }
 
-  .card {
-    width: min(100%, 320px);
-    justify-self: end;
+  .rideCard .card,
+  .stackItem .card {
+    width: 100%;
   }
 
-  .cardFrame {
-    aspect-ratio: 16 / 11;
+  .rideCard .cardFrame,
+  .stackItem .cardFrame {
+    aspect-ratio: 16 / 10;
     max-height: 28dvh;
+  }
+
+  .copyItem .index,
+  .copyItem .items,
+  .copyItem .count,
+  .stack .index,
+  .stack .items,
+  .stack .count {
+    display: none;
   }
 
   .stackItem {
     grid-template-columns: 1fr;
+  }
+
+  .stackItem .card {
+    order: -1;
   }
 }
 

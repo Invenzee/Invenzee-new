@@ -109,7 +109,7 @@ export function Services() {
     const spacing = height; // one full screen per service, so only one is ever visible
 
     // Horizontal lines end where the copy ends and the card starts.
-    const card = stage.querySelector<HTMLElement>(`.${styles.card}`);
+    const card = stage.querySelector<HTMLElement>(`.${styles.stageInner} .${styles.card}`);
     const endX = !compact && card ? card.getBoundingClientRect().left - stageBox.left : width;
 
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -262,6 +262,9 @@ export function Services() {
                 className={styles.copyItem}
                 aria-hidden={index === active ? undefined : true}
               >
+                <div className={styles.rideCard}>
+                  <ServiceCard index={index} />
+                </div>
                 <ServiceCopy index={index} />
               </div>
             ))}
@@ -298,7 +301,7 @@ function ServiceCard({ index, stacked = false }: { index: number; stacked?: bool
         )}
         <div className={styles.caption}>
           <span className="t-label">{headingText(service.title)}</span>
-          <span className="t-label tabular-nums">
+          <span className={`t-label tabular-nums ${styles.count}`}>
             {pad(index + 1)}
             <span aria-hidden="true" className="px-[0.45em] text-signal">
               /
