@@ -258,7 +258,6 @@
   background: var(--color-ink);
   /* Chrome skips painting a video that faded in with its parent unless the video has its own layer. */
   transform: translateZ(0);
-  will-change: transform;
 }
 
 .stack {

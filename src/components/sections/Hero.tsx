@@ -108,6 +108,11 @@ function HeroFilm() {
     if (!video) return;
     video.muted = true;
 
+    const bufferedAhead = () => {
+      if (video.buffered.length === 0) return 0;
+      return video.buffered.end(video.buffered.length - 1) - video.currentTime;
+    };
+
     const sync = () => {
       if (video.offsetParent === null) {
         video.pause();
@@ -117,16 +122,22 @@ function HeroFilm() {
         video.pause();
         return;
       }
+      /* Start once a couple of seconds are buffered so playback doesn't stall immediately. */
+      if (video.readyState < 3 && bufferedAhead() < 1.5) return;
       if (video.paused) void video.play().catch(() => {});
     };
 
     sync();
-    video.addEventListener("loadeddata", sync);
+    video.addEventListener("canplay", sync);
+    video.addEventListener("canplaythrough", sync);
+    video.addEventListener("progress", sync);
     const section = video.closest("section");
     const observer = new IntersectionObserver(sync, { threshold: 0.01 });
     if (section) observer.observe(section);
     return () => {
-      video.removeEventListener("loadeddata", sync);
+      video.removeEventListener("canplay", sync);
+      video.removeEventListener("canplaythrough", sync);
+      video.removeEventListener("progress", sync);
       observer.disconnect();
     };
   }, []);
@@ -508,7 +519,7 @@ export function Hero() {
       <div className={styles.cardWrap}>
         <div className="wrap">
           <div className={`rounded-card ${styles.card}`}>
-            <HeroFilm />
+            <img className={styles.film} src="/hero-poster.webp" alt="" />
             <div className={styles.cardScrim} aria-hidden="true" />
             <div className={styles.cardCopy}>
               <Reveal>
