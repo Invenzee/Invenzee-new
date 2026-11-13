@@ -1,18 +1,16 @@
-/* Same motion as @keyframes marquee-x in globals.css (0 → -50%).
-   margin-left on .track keeps a constant left bleed so the scroll scrub
-   (±4%) never opens a gap. The two halves stay equal, so the loop is seamless. */
+/* Two equal halves. Scroll moves a row by one half, so the join stays hidden. */
 
 .stack {
   display: flex;
   flex-direction: column;
   gap: 0.08em;
   color: var(--fg);
-  font-family: var(--font-display);
-  font-weight: 800;
+  font-family: var(--font-accent);
+  font-weight: 400;
   font-size: clamp(3rem, 1rem + 8vw, 9.5rem);
   line-height: 1;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   user-select: none;
 }
 
@@ -29,15 +27,8 @@
 .track {
   display: flex;
   width: max-content;
-  margin-left: -6vw;
   white-space: nowrap;
-  animation: drift 48s linear infinite;
-  animation-play-state: paused;
-}
-
-.reverse {
-  animation-duration: 60s;
-  animation-direction: reverse;
+  will-change: transform;
 }
 
 .half {
@@ -51,10 +42,6 @@
   align-items: baseline;
 }
 
-.track :global(.accent) {
-  padding-inline: 0.03em;
-}
-
 .stroke {
   color: transparent;
   -webkit-text-fill-color: transparent;
@@ -66,28 +53,14 @@
 .slash {
   margin-inline: 0.25em;
   color: var(--color-cyan);
-  font-weight: 300;
+  font-weight: 400;
   -webkit-text-fill-color: var(--color-cyan);
   -webkit-text-stroke: 0;
   text-transform: none;
 }
 
-@keyframes drift {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stack {
     padding-inline: var(--m);
-  }
-
-  .track {
-    margin-left: 0;
-    animation: none;
   }
 }

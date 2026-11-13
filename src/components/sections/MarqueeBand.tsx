@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { marquee } from "@/content/site";
 import { gsap, useGSAP } from "@/lib/gsap";
 import styles from "./MarqueeBand.module.css";
@@ -14,21 +14,22 @@ export function MarqueeBand() {
       if (!root) return;
 
       const mm = gsap.matchMedia();
-      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-        const shifts = gsap.utils.toArray<HTMLElement>("[data-shift]", root);
-        shifts.forEach((el, i) => {
-          const from = i === 0 ? 4 : -4;
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const rows = gsap.utils.toArray<HTMLElement>("[data-marquee]", root);
+        rows.forEach((el, i) => {
+          const reverse = i === 1;
+          const travel = Math.min(160, el.offsetWidth * 0.025);
           gsap.fromTo(
             el,
-            { xPercent: from },
+            { x: reverse ? -travel : 0 },
             {
-              xPercent: -from,
+              x: reverse ? 0 : -travel,
               ease: "none",
               scrollTrigger: {
                 trigger: root,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: true,
+                scrub: 0.6,
               },
             },
           );
@@ -38,28 +39,6 @@ export function MarqueeBand() {
     { scope },
   );
 
-  useEffect(() => {
-    const root = scope.current;
-    if (!root) return;
-    const rows = root.querySelectorAll<HTMLElement>("[data-marquee]");
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const state = entry?.isIntersecting ? "running" : "paused";
-        rows.forEach((row) => {
-          row.style.animationPlayState = state;
-        });
-      },
-      { rootMargin: "120px 0px" },
-    );
-    io.observe(root);
-    return () => {
-      io.disconnect();
-      rows.forEach((row) => {
-        row.style.animationPlayState = "";
-      });
-    };
-  }, []);
-
   return (
     <section
       ref={scope}
@@ -68,29 +47,22 @@ export function MarqueeBand() {
     >
       <div className={styles.stack}>
         <WordRow />
-        <WordRow reverse outline />
+        <WordRow outline />
       </div>
     </section>
   );
 }
 
-function wordClass(accent: boolean, outline: boolean) {
-  if (accent && outline) return `accent ${styles.stroke}`;
-  if (accent) return "accent";
-  if (outline) return styles.stroke;
-  return undefined;
-}
-
-function WordRow({ reverse = false, outline = false }: { reverse?: boolean; outline?: boolean }) {
+function WordRow({ outline = false }: { outline?: boolean }) {
   return (
     <div className={styles.shift}>
-      <div data-shift className={styles.scrub}>
-        <div data-marquee className={reverse ? `${styles.track} ${styles.reverse}` : styles.track}>
+      <div className={styles.scrub}>
+        <div data-marquee className={styles.track}>
           {[0, 1].map((copy) => (
             <div className={styles.half} key={copy}>
               {marquee.words.map((word, i) => (
                 <span className={styles.item} key={`${copy}-${i}`}>
-                  <span className={wordClass(i % 2 === 1, outline)}>{word}</span>
+                  <span className={outline ? styles.stroke : undefined}>{word}</span>
                   <span className={styles.slash}>/</span>
                 </span>
               ))}
