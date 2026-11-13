@@ -13,6 +13,8 @@ import { Showcase } from "@/components/sections/Showcase";
 export default function Home() {
   return (
     <>
+      <link rel="preload" href="/hero-poster.webp" as="image" type="image/webp" fetchPriority="high" />
+      <link rel="preload" href="/hero.mp4" as="video" type="video/mp4" fetchPriority="high" />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:mark focus:bg-cyan focus:px-5 focus:py-3 focus:font-display focus:font-semibold focus:text-navy"

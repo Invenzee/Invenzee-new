@@ -100,6 +100,55 @@ function ArtStack({ active, prev }: { active: number; prev: number }) {
   );
 }
 
+function HeroFilm() {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    video.muted = true;
+
+    const sync = () => {
+      if (video.offsetParent === null) {
+        video.pause();
+        return;
+      }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        video.pause();
+        return;
+      }
+      if (video.paused) void video.play().catch(() => {});
+    };
+
+    sync();
+    video.addEventListener("loadeddata", sync);
+    const section = video.closest("section");
+    const observer = new IntersectionObserver(sync, { threshold: 0.01 });
+    if (section) observer.observe(section);
+    return () => {
+      video.removeEventListener("loadeddata", sync);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      className={styles.film}
+      poster="/hero-poster.webp"
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+      tabIndex={-1}
+    >
+      <source src="/hero.mp4" type="video/mp4" />
+    </video>
+  );
+}
+
 function Statement({ scroll = false }: { scroll?: boolean }) {
   return (
     <p className={styles.statementText} aria-label={STATEMENT_LABEL}>
@@ -446,7 +495,8 @@ export function Hero() {
           </div>
 
           <div className={styles.media} data-anim="media">
-            <ArtStack active={frame.active} prev={frame.prev} />
+            <HeroFilm />
+            <span className={styles.corner} data-corner="" />
             <div className={styles.scrim} data-anim="scrim" aria-hidden="true" />
             <div className={styles.statement} data-anim="statement">
               <Statement scroll />
@@ -458,7 +508,7 @@ export function Hero() {
       <div className={styles.cardWrap}>
         <div className="wrap">
           <div className={`rounded-card ${styles.card}`}>
-            <ArtStack active={frame.active} prev={frame.prev} />
+            <HeroFilm />
             <div className={styles.cardScrim} aria-hidden="true" />
             <div className={styles.cardCopy}>
               <Reveal>
