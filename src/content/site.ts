@@ -438,7 +438,7 @@ export const process = {
   heading: [
     "From brief to ",
     { accent: "launch" },
-    " in four moves",
+    " in six moves",
   ] satisfies HeadingPart[],
   intro:
     "A clear path keeps projects on time and on budget. Here is how every engagement runs.",
@@ -455,13 +455,23 @@ export const process = {
     },
     {
       n: "03",
-      title: "Create",
-      text: "Designers, developers, editors and illustrators work in parallel, with regular check-ins along the way.",
+      title: "Design",
+      text: "We shape the look, the words and the structure, and you approve them before a line of the build starts.",
     },
     {
       n: "04",
-      title: "Launch & grow",
-      text: "We ship, measure and keep improving, with SEO, ads and content that build on each other.",
+      title: "Build",
+      text: "Designers, developers, editors and illustrators work in parallel, with regular check-ins along the way.",
+    },
+    {
+      n: "05",
+      title: "Launch",
+      text: "We ship the site, the campaign or the product, and check that every piece works in the real world.",
+    },
+    {
+      n: "06",
+      title: "Grow",
+      text: "We measure what lands and keep improving, with SEO, ads and content that build on each other.",
     },
   ],
 };

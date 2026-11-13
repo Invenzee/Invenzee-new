@@ -2,7 +2,8 @@
    Desktop: "Our Work" fades into the center. Scroll grows it, fades it,
    and parks the whole word under the nav. After it sits, the yard and
    cards come in, then the rail scrubs sideways.
-   Mobile and reduced motion: the title stays parked and the rail scrolls natively.
+   Phones use the same scroll: the title parks, then the rail scrubs sideways.
+   Reduced motion: the title stays parked and the rail scrolls natively.
    The yard (bars + 10…100) rides with the cards. */
 
 .section {
@@ -435,7 +436,7 @@
   }
 }
 
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   .stage {
     position: sticky;
     top: 0;
@@ -486,7 +487,34 @@
   }
 }
 
-@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+/* One card at a time. The scrub is unchanged; only the size fits the screen. */
+@media (max-width: 1023px) {
+  .viewport {
+    --gap-a: 28px;
+    --gap-b: 36px;
+    --gap-c: 32px;
+    --card-w: min(68vw, 260px);
+    --lead: calc(var(--work-w, 100vw) * 0.16);
+  }
+
+  .cards {
+    padding-bottom: 36px;
+  }
+
+  .bar {
+    height: 32vh;
+  }
+
+  .num {
+    font-size: clamp(2.25rem, 14vw, 3.4rem);
+  }
+
+  .cardTitle {
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   .track {
     height: auto !important;
   }
@@ -494,9 +522,7 @@
   .rail {
     transform: none !important;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
   .frame,
   .shine,
   .view,

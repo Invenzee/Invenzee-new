@@ -108,7 +108,7 @@ export function Showcase() {
       if (next === width) return;
       width = next;
       viewport.style.setProperty("--work-w", next);
-      if (window.matchMedia("(min-width: 1024px)").matches) viewport.scrollLeft = 0;
+      if (window.matchMedia("(prefers-reduced-motion: no-preference)").matches) viewport.scrollLeft = 0;
       ScrollTrigger.refresh();
     };
     fit();
@@ -121,7 +121,7 @@ export function Showcase() {
     () => {
       const mm = gsap.matchMedia();
 
-      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
         const track = trackRef.current;
         const stage = stageRef.current;
         const viewport = viewportRef.current;

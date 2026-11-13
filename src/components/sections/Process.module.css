@@ -1,48 +1,256 @@
-.node {
-  width: 12px;
-  height: 12px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-mark);
-  background: var(--color-paper-2);
-  transition:
-    background-color 300ms var(--ease-expo),
-    border-color 300ms var(--ease-expo);
-}
+/* How we work
+   Six cards in a zig-zag: 1, 3, 5 sit high, 2, 4, 6 sit lower.
+   The route runs behind the cards. When it reaches a card it splits in two,
+   the two strokes wrap round the card as its border and meet on the far side,
+   then that same colour fills the card from the bottom, like glass, and the route carries on. */
 
-.nodeOn {
-  background: var(--signal);
-  border-color: var(--signal);
-}
-
-.fill {
-  transform: scaleX(0);
-  transform-origin: left center;
-}
-
-.step {
-  min-width: 0;
-}
-
-.num {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(3.5rem, 2rem + 4.5vw, 6.5rem);
-  font-variant-numeric: tabular-nums;
-  line-height: 0.9;
-  letter-spacing: -0.05em;
-  color: var(--fg);
-  transition: color 400ms var(--ease-expo);
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .step {
-    border-top: 1px solid var(--line);
+   .section {
+    max-width: 100%;
+    min-width: 0;
   }
-}
-
-@media (min-width: 1024px) and (hover: hover) {
-  .step:hover .num {
-    color: var(--signal);
+  
+  .track {
+    position: relative;
+    width: 100%;
   }
-}
+  
+  .stage {
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(var(--nav-h) + 28px);
+    padding-bottom: clamp(56px, 8vw, 96px);
+  }
+  
+  .head {
+    flex: none;
+  }
+  
+  .viewport {
+    --gap: clamp(56px, 5vw, 96px);
+    --card-w: min(78vw, 340px);
+    --start: var(--m);
+    --stagger: 100px;
+    --fill: var(--signal); /* line and card fill are the same theme colour */
+    position: relative;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  
+  .viewport::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .rail {
+    position: relative;
+    width: max-content;
+  }
+  
+  /* Route sits under the cards. */
+  .route,
+  .edges {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  
+  .route {
+    z-index: 0;
+  }
+  
+  /* Borders sit over the cards. */
+  .edges {
+    z-index: 2;
+  }
+  
+  .draw,
+  .edge {
+    fill: none;
+    stroke: var(--fill);
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 100000;
+    stroke-dashoffset: 100000;
+  }
+  
+  .edge {
+    opacity: 0;
+  }
+  
+  .cards {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap);
+    margin: 0;
+    padding: 36px var(--m) 48px var(--start);
+    list-style: none;
+  }
+  
+  .card {
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: var(--card-w);
+    min-height: clamp(280px, 38vh, 360px);
+    padding: 36px 28px 32px 32px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    border: 0;
+    border-radius: 28px;
+    background: #fff; /* opaque, so the route never shows through */
+    box-shadow: 0 0 0 1px var(--line);
+    transition: box-shadow 400ms var(--ease-expo);
+  }
+  
+  /* 2nd, 4th, 6th cards sit lower. */
+  .card:nth-child(even) {
+    margin-top: var(--stagger);
+  }
+  
+  /* Glass filling from the bottom. The light band is the surface of the glass.
+     Pulled 1px past the edge so it sits under the stroke, with no hairline gap. */
+  .card::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    right: -1px;
+    bottom: -1px;
+    left: -1px;
+    height: calc(100% + 2px);
+    border-radius: inherit;
+    background:
+      radial-gradient(90% 16px at 50% 0, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 72%),
+      linear-gradient(90deg, color-mix(in srgb, white 22%, transparent) 0, transparent 28%),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--fill) 70%, white) 0,
+        var(--fill) 22px,
+        color-mix(in srgb, var(--fill) 84%, #062029) 100%
+      );
+    transform: translate3d(0, 101%, 0);
+    transition: transform 1.8s cubic-bezier(0.22, 0.5, 0.28, 1);
+  }
+  
+  .card > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .on {
+    box-shadow: none;
+  }
+  
+  .on::before {
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .num {
+    display: block;
+    margin-bottom: 20px;
+    font-family: var(--font-accent);
+    font-weight: 400;
+    font-size: clamp(2.75rem, 1.4rem + 2vw, 4rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 0.85;
+    letter-spacing: 0;
+    color: var(--fill);
+    transition: color 280ms var(--ease-expo) 120ms;
+  }
+  
+  .title {
+    font-family: var(--font-display);
+    margin: 0;
+    transition: color 280ms var(--ease-expo) 480ms;
+  }
+  
+  .copy {
+    max-width: 32ch;
+    margin: 0.8rem 0 0;
+    color: var(--fg-2);
+    transition: color 280ms var(--ease-expo) 900ms;
+  }
+  
+  /* Type turns as the surface reaches it: copy first, the number last. */
+  .on .num,
+  .on .title,
+  .on .copy {
+    color: #fff;
+  }
+
+  .on .copy {
+    transition-delay: 0.45s;
+  }
+
+  .on .title {
+    transition-delay: 0.95s;
+  }
+
+  .on .num {
+    transition-delay: 1.35s;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .stage {
+      position: sticky;
+      top: 0;
+      height: auto;
+      min-height: 100dvh;
+      overflow: visible;
+      padding-top: calc(var(--nav-h) + 12px);
+      padding-bottom: clamp(32px, 4vh, 56px);
+    }
+  
+    .viewport {
+      flex: none;
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: visible;
+      scroll-snap-type: none;
+    }
+  }
+
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .viewport {
+      --card-w: clamp(280px, 24vw, 340px);
+      --start: clamp(160px, 22.3vw, 300px);
+    }
+  }
+  
+  @media (max-width: 1023px) {
+    .head {
+      padding-bottom: clamp(20px, 4vw, 36px);
+    }
+
+    .viewport {
+      --gap: clamp(28px, 6vw, 48px);
+      --card-w: min(74vw, 300px);
+      --start: var(--m);
+      --stagger: 56px;
+    }
+
+    .cards {
+      padding: 20px var(--m) 28px var(--start);
+    }
+
+    .card {
+      min-height: 230px;
+      padding: 28px 22px 24px 22px;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .card::before,
+    .num,
+    .title,
+    .copy {
+      transition: none;
+    }
+  }
