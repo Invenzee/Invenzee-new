@@ -12,6 +12,13 @@ import styles from "./Showcase.module.css";
 
 /** One numbered line per project, plus a single empty step after the last card. */
 const MARKS = Array.from({ length: showcase.items.length + 1 }, (_, index) => (index + 1) * 10);
+/** Scroll, in viewport heights, while "Our Work" grows from the center to the top. */
+const TITLE_SCROLL = 1.05;
+/** A short rest once the title is parked, before the yard and cards arrive. */
+const TITLE_HOLD = 0.12;
+/** Scroll, in viewport heights, while the yard and cards come in. */
+const REVEAL_SCROLL = 0.5;
+const REVEAL_RISE = 56;
 /** Three equal ticks in the middle of each gap, clear of the numbers. */
 const MINOR_AT = [0.35, 0.5, 0.65];
 
@@ -32,6 +39,39 @@ function yardTicks() {
   return ticks;
 }
 
+function offsetWithin(node: HTMLElement, ancestor: HTMLElement) {
+  let x = 0;
+  let y = 0;
+  let current: HTMLElement | null = node;
+  while (current && current !== ancestor) {
+    x += current.offsetLeft;
+    y += current.offsetTop;
+    current = current.offsetParent as HTMLElement | null;
+  }
+  if (current !== ancestor) return null;
+  return { x, y };
+}
+
+/** Layout box of the words and the mark, ignoring scroll transforms. */
+function inkBox(title: HTMLElement, stage: HTMLElement) {
+  const nodes = [...title.querySelectorAll<HTMLElement>(".hw, .dot")];
+  if (!nodes.length) return null;
+  let left = Infinity;
+  let right = -Infinity;
+  let top = Infinity;
+  let bottom = -Infinity;
+  for (const node of nodes) {
+    const o = offsetWithin(node, stage);
+    if (!o) return null;
+    left = Math.min(left, o.x);
+    right = Math.max(right, o.x + node.offsetWidth);
+    top = Math.min(top, o.y);
+    bottom = Math.max(bottom, o.y + node.offsetHeight);
+  }
+  if (!Number.isFinite(left) || right <= left) return null;
+  return { left, top, width: right - left, height: bottom - top };
+}
+
 function horizontalDistance(rail: HTMLElement, viewport: HTMLElement) {
   const view = viewport.clientWidth;
   const fromWidth = Math.max(0, rail.scrollWidth - view);
@@ -46,6 +86,8 @@ function horizontalDistance(rail: HTMLElement, viewport: HTMLElement) {
 
 export function Showcase() {
   const scope = useRef<HTMLElement>(null);
+  const headRef = useRef<HTMLElement>(null);
+  const enterRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -84,18 +126,77 @@ export function Showcase() {
         const stage = stageRef.current;
         const viewport = viewportRef.current;
         const rail = railRef.current;
-        if (!track || !stage || !viewport || !rail) return;
+        const head = headRef.current;
+        const enter = enterRef.current;
+        const title = head?.querySelector<HTMLElement>(".t-h2");
+        if (!track || !stage || !viewport || !rail || !head || !enter || !title) return;
 
         let alive = true;
+        const revealEase = gsap.parseEase("power2.out");
 
         const resetNativeScroll = () => {
           if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
         };
 
+        const metrics = () => {
+          const vh = window.innerHeight;
+          const titleSpan = vh * TITLE_SCROLL;
+          const hold = vh * TITLE_HOLD;
+          const reveal = vh * REVEAL_SCROLL;
+          const travel = horizontalDistance(rail, viewport);
+          return { titleSpan, hold, reveal, travel, total: titleSpan + hold + reveal + travel };
+        };
+
+        const phase = (px: number, start: number, span: number) => {
+          if (span <= 0) return px >= start ? 1 : 0;
+          return gsap.utils.clamp(0, 1, (px - start) / span);
+        };
+
+        /* 0 → title parks at the top. Then a beat. Then the yard and cards. Then the rail. */
+        const apply = (progress: number) => {
+          const { titleSpan, hold, reveal, travel, total } = metrics();
+          const px = gsap.utils.clamp(0, 1, progress) * total;
+          const titleP = phase(px, 0, titleSpan);
+
+          gsap.set(title, {
+            fontSize: `${gsap.utils.interpolate(10.3, 23.3, titleP)}cqw`,
+            marginTop: 0,
+          });
+          /* Measure from a known origin so the entrance transform is ignored. */
+          gsap.set(head, { top: 0, x: 0, y: 0, yPercent: 0 });
+          const box = inkBox(title, stage);
+          if (box) {
+            const navH =
+              Number.parseFloat(
+                getComputedStyle(document.documentElement).getPropertyValue("--nav-h"),
+              ) || 0;
+            /* Keep the whole word inside the stage: centered, then parked
+               just under the nav. A negative pull was slicing the caps off. */
+            const startTop = (stage.clientHeight - box.height) / 2 - box.top;
+            const endTop = navH + 16 - box.top;
+            gsap.set(head, {
+              top: gsap.utils.interpolate(startTop, endTop, titleP),
+              x: (stage.clientWidth - box.width) / 2 - box.left,
+              y: 0,
+              opacity: gsap.utils.interpolate(1, 0.5, titleP),
+            });
+          }
+
+          const revealP = phase(px, titleSpan + hold, reveal);
+          const eased = revealEase(revealP);
+          gsap.set(viewport, {
+            autoAlpha: eased,
+            y: gsap.utils.interpolate(REVEAL_RISE, 0, eased),
+            pointerEvents: revealP >= 1 ? "auto" : "none",
+          });
+
+          const moved = Math.min(travel, Math.max(0, px - titleSpan - hold - reveal));
+          gsap.set(rail, { x: -moved });
+        };
+
         const syncHeight = () => {
           resetNativeScroll();
-          const distance = horizontalDistance(rail, viewport);
-          const trackHeight = Math.max(stage.offsetHeight, window.innerHeight) + distance;
+          const trackHeight = Math.max(stage.offsetHeight, window.innerHeight) + metrics().total;
           gsap.set(track, { height: trackHeight });
         };
 
@@ -104,15 +205,45 @@ export function Showcase() {
         syncHeight();
         ScrollTrigger.addEventListener("refreshInit", syncHeight);
 
-        const tween = gsap.to(rail, {
-          x: () => -horizontalDistance(rail, viewport),
+        const playhead = { p: 0 };
+        const tween = gsap.to(playhead, {
+          p: 1,
           ease: "none",
+          onUpdate: () => apply(playhead.p),
           scrollTrigger: {
             trigger: track,
             start: "top top",
             end: "bottom bottom",
             scrub: 0.6,
             invalidateOnRefresh: true,
+          },
+        });
+        apply(tween.scrollTrigger?.progress ?? 0);
+
+        const playEnter = () => {
+          gsap.fromTo(
+            enter,
+            { autoAlpha: 0, y: 36 },
+            { autoAlpha: 1, y: 0, duration: 1.15, ease: "expo.out", overwrite: "auto" },
+          );
+        };
+        let entered = track.getBoundingClientRect().top < window.innerHeight * 0.86;
+        if (entered) gsap.set(enter, { autoAlpha: 1, y: 0 });
+        const intro = ScrollTrigger.create({
+          trigger: track,
+          start: "top 86%",
+          onEnter: () => {
+            if (entered) return;
+            entered = true;
+            playEnter();
+          },
+          onEnterBack: () => {
+            entered = true;
+            playEnter();
+          },
+          onLeaveBack: () => {
+            entered = false;
+            gsap.set(enter, { autoAlpha: 0, y: 36 });
           },
         });
 
@@ -126,10 +257,12 @@ export function Showcase() {
         return () => {
           alive = false;
           viewport.removeEventListener("scroll", resetNativeScroll);
+          intro.kill();
           tween.scrollTrigger?.kill();
           tween.kill();
           ScrollTrigger.removeEventListener("refreshInit", syncHeight);
-          gsap.set(rail, { clearProps: "transform" });
+          gsap.set([head, enter, title, viewport, rail], { clearProps: "all" });
+          gsap.set(track, { clearProps: "height" });
         };
       });
     },
@@ -142,8 +275,10 @@ export function Showcase() {
     <section id={showcase.id} ref={scope} className={`theme-dark relative ${styles.section}`}>
       <div ref={trackRef} className={styles.track}>
         <div ref={stageRef} className={styles.stage}>
-          <header className={styles.head}>
-            <Heading parts={showcase.heading} as="h2" className="t-h2" />
+          <header ref={headRef} className={styles.head}>
+            <div ref={enterRef} className={styles.enter}>
+              <Heading parts={showcase.heading} as="h2" className="t-h2" show />
+            </div>
           </header>
 
           <div ref={viewportRef} className={styles.viewport}>

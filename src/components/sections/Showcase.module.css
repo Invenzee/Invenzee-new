@@ -1,6 +1,8 @@
 /* Work rail
-   Desktop: a sticky stage, scrubbed sideways with the page scroll.
-   Mobile and reduced motion: the same rail scrolls natively.
+   Desktop: "Our Work" fades into the center. Scroll grows it, fades it,
+   and parks the whole word under the nav. After it sits, the yard and
+   cards come in, then the rail scrubs sideways.
+   Mobile and reduced motion: the title stays parked and the rail scrolls natively.
    The yard (bars + 10…100) rides with the cards. */
 
 .section {
@@ -441,6 +443,31 @@
     overflow: hidden;
     padding-top: calc(var(--nav-h) + 16px);
     padding-bottom: 0;
+  }
+
+  /* Scroll grows this from the center to just under the nav. */
+  .head {
+    top: 50%;
+    left: 0;
+    opacity: 1;
+    transform: translateY(-50%);
+  }
+
+  .head :global(.t-h2) {
+    margin-top: 0;
+    font-size: 10.3cqw;
+  }
+
+  .enter {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+
+  .viewport {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(56px);
+    pointer-events: none;
   }
 
   .viewport,
