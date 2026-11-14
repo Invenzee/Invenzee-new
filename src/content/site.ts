@@ -136,6 +136,7 @@ export type Service = {
   art: ArtVariant;
   tone: ArtTone;
   cta: string;
+  image?: string;
 };
 
 export const services = {
@@ -159,6 +160,7 @@ export const services = {
       ],
       art: "growth",
       tone: "ink",
+      image: "/services/marketing.jpg",
       cta: "Grow your audience",
     },
     {
@@ -176,6 +178,7 @@ export const services = {
       ],
       art: "brand",
       tone: "navy",
+      image: "/services/design.jpg",
       cta: "Build your brand",
     },
     {
@@ -193,6 +196,7 @@ export const services = {
       ],
       art: "web",
       tone: "ink",
+      image: "/services/web.jpg",
       cta: "Launch your website",
     },
     {
@@ -210,6 +214,7 @@ export const services = {
       ],
       art: "app",
       tone: "navy",
+      image: "/services/software.jpg",
       cta: "Build your product",
     },
     {
@@ -227,6 +232,7 @@ export const services = {
       ],
       art: "motion",
       tone: "cyan",
+      image: "/services/video.jpg",
       cta: "Tell your story",
     },
     {
@@ -244,6 +250,7 @@ export const services = {
       ],
       art: "illustration",
       tone: "cyan",
+      image: "/services/illustration.jpg",
       cta: "Draw your world",
     },
   ] satisfies Service[],
@@ -263,172 +270,233 @@ export type ShowcaseItem = {
   tone: ArtTone;
   /** Real photo. When omitted, the card and the dialog use the artwork. */
   image?: string;
+  /** Full-page website. The card shows the hero; the popup scrolls the rest. */
+  long?: boolean;
   blocks: WorkBlock[];
 };
 
-/* TODO(invenzee): replace these capability cards with real case studies
-   (client name, real screenshot/photo, result) once project assets are ready.
-   Drop a photo path on `image`, and keep adding `blocks` for the dialog. */
+function work(
+  title: string,
+  discipline: string,
+  color: MarkerColor,
+  file: string,
+  blurb: string,
+  long = false,
+): ShowcaseItem {
+  return {
+    title,
+    discipline,
+    color,
+    blurb,
+    art: "web",
+    tone: "ink",
+    image: `/real%20project%20images/${encodeURIComponent(file)}`,
+    ...(long ? { long: true } : {}),
+    blocks: [
+      { kind: "text", text: blurb },
+      { kind: "button", label: "Start a project", href: "#contact" },
+    ],
+  };
+}
+
 export const showcase = {
   id: "work",
   label: "What we make",
   heading: [" ", { accent: "Our Work" }] satisfies HeadingPart[],
   intro:
-    "From a logo sketch to a shipped product: the range we cover without leaving the building.",
+    "Logos, apps and websites from the work. Long sites open on the hero, then scroll in the popup.",
   link: { label: "Start a project", href: "#contact" },
   items: [
-    {
-      title: "Logo & identity systems",
-      discipline: "Graphic design",
-      color: "coral",
-      blurb: "Marks, palettes and guidelines built to be recognised at a glance.",
-      art: "brand",
-      tone: "navy",
-      blocks: [
-        {
-          kind: "text",
-          text: "A mark is only the start. We build the palette, the type and the rules that keep a brand looking like itself on a website, a reel and a printed box.",
-        },
-        {
-          kind: "text",
-          text: "You leave with a logo, a short guideline and a set of templates your team can actually use.",
-        },
-        { kind: "button", label: "Start a project", href: "#contact" },
-      ],
-    },
-    {
-      title: "E-commerce stores",
-      discipline: "Website development",
-      color: "cyan",
-      blurb: "Storefronts that load fast, look sharp and make checkout easy.",
-      art: "web",
-      tone: "ink",
-      blocks: [
-        {
-          kind: "text",
-          text: "We design the shop around the way people actually buy: clear products, a short path to checkout, and pages that stay fast on a phone.",
-        },
-        {
-          kind: "text",
-          text: "The store is yours to run. We set up the catalogue, payments and the basics of hosting, then hand it over with a walkthrough.",
-        },
-        { kind: "button", label: "Launch your website", href: "#contact" },
-      ],
-    },
-    {
-      title: "Search & paid campaigns",
-      discipline: "Digital marketing",
-      color: "lime",
-      blurb: "SEO and PPC run together, so every click has a job to do.",
-      art: "growth",
-      tone: "paper",
-      blocks: [
-        {
-          kind: "text",
-          text: "Search and ads are planned as one system. The pages we improve are the pages the ads send people to, so the spend and the content pull the same way.",
-        },
-        {
-          kind: "text",
-          text: "You get a plain report: what was spent, what came back, and what we change next month.",
-        },
-        { kind: "button", label: "Grow your audience", href: "#contact" },
-      ],
-    },
-    {
-      title: "Mobile & web apps",
-      discipline: "Software development",
-      color: "violet",
-      blurb: "Products shaped around your workflow, from prototype to release.",
-      art: "app",
-      tone: "cyan",
-      blocks: [
-        {
-          kind: "text",
-          text: "We start from the job the software has to do, then prototype the flow before a line of production code. You see the product while it is still cheap to change.",
-        },
-        {
-          kind: "text",
-          text: "Web apps, mobile apps and the APIs between them ship from the same team, so the pieces fit.",
-        },
-        { kind: "button", label: "Build your product", href: "#contact" },
-      ],
-    },
-    {
-      title: "Reels & explainers",
-      discipline: "Video editing",
-      color: "amber",
-      blurb: "Short-form edits and motion graphics made for the scroll.",
-      art: "motion",
-      tone: "navy",
-      blocks: [
-        {
-          kind: "text",
-          text: "A reel has a few seconds to earn the next second. We cut for that, then build motion graphics that explain the offer without a voiceover doing all the work.",
-        },
-        {
-          kind: "text",
-          text: "Delivered in the sizes your channels need, from a vertical cut to a longer explainer.",
-        },
-        { kind: "button", label: "Tell your story", href: "#contact" },
-      ],
-    },
-    {
-      title: "Custom illustration",
-      discipline: "Illustration",
-      color: "pink",
-      blurb: "Characters, icons and editorial artwork drawn for your brand only.",
-      art: "illustration",
-      tone: "paper",
-      blocks: [
-        {
-          kind: "text",
-          text: "Illustration gives a brand a face that stock art cannot. We draw characters, icons and editorial pieces that belong to you and no one else.",
-        },
-        {
-          kind: "text",
-          text: "The same hand can carry a set across a site, a deck and a social series, so the pictures agree with each other.",
-        },
-        { kind: "button", label: "Draw your world", href: "#contact" },
-      ],
-    },
-    {
-      title: "Social media content",
-      discipline: "Digital marketing",
-      color: "lime",
-      blurb: "Calendars, creatives and captions that keep your feed alive.",
-      art: "brand",
-      tone: "cyan",
-      blocks: [
-        {
-          kind: "text",
-          text: "A feed dies when every post starts from zero. We build a calendar, a set of layouts and captions that your team can keep going after the first month.",
-        },
-        {
-          kind: "text",
-          text: "Design, copy and the cut of a short video come from one team, so the week looks planned.",
-        },
-        { kind: "button", label: "Plan your feed", href: "#contact" },
-      ],
-    },
-    {
-      title: "Business dashboards",
-      discipline: "Software development",
-      color: "violet",
-      blurb: "Your numbers in one place, built on the tools you already use.",
-      art: "growth",
-      tone: "ink",
-      blocks: [
-        {
-          kind: "text",
-          text: "The numbers you already collect, pulled into one view. We connect the tools you use and show the few figures that change a decision.",
-        },
-        {
-          kind: "text",
-          text: "No new system to learn for its own sake. The dashboard sits on top of the stack you have.",
-        },
-        { kind: "button", label: "See your numbers", href: "#contact" },
-      ],
-    },
+    work(
+      "Connect",
+      "Software development",
+      "violet",
+      "image (1).png",
+      "A matching app: welcome, login, discovery and chat, laid out as one product.",
+    ),
+    work(
+      "City General Hospital",
+      "Software development",
+      "cyan",
+      "image (2).png",
+      "A hospital app for getting started, signing in, booking a doctor and reading records.",
+    ),
+    work(
+      "Aurora",
+      "Software development",
+      "violet",
+      "image (3).png",
+      "A digital wallet: the start screen, a balance, a secure PIN and sending money.",
+    ),
+    work(
+      "HomeHaven",
+      "Software development",
+      "cyan",
+      "image (4).png",
+      "A stays app for finding a cabin, reading the listing and confirming a booking.",
+    ),
+    work(
+      "Western Foods",
+      "Graphic design",
+      "coral",
+      "image (5).png",
+      "A food mark built from a cloche and a sauce bottle, set in black and orange.",
+    ),
+    work(
+      "Private Chef Wānaka",
+      "Graphic design",
+      "lime",
+      "image (6).png",
+      "A mountain mark for a private chef, with a local and sustainable line underneath.",
+    ),
+    work(
+      "The Burger And Bowl",
+      "Graphic design",
+      "coral",
+      "image (7).png",
+      "A burger illustration and a hand-lettered wordmark for a casual food brand.",
+    ),
+    work(
+      "Just 4u By Ell",
+      "Graphic design",
+      "amber",
+      "image (8).png",
+      "A leaf mark and a wordmark for an all-natural hair growth oil.",
+    ),
+    work(
+      "Liberty Tax",
+      "Graphic design",
+      "violet",
+      "image (9).png",
+      "A navy and red mark pairing a house, an upward arrow and the Statue of Liberty.",
+    ),
+    work(
+      "Abritex",
+      "Graphic design",
+      "violet",
+      "image (10).png",
+      "A wordmark with a gradient stroke for Abritex LLC.",
+    ),
+    work(
+      "The Hero Project",
+      "Graphic design",
+      "coral",
+      "image (11).png",
+      "A shield, a star and a rising arrow for a community project.",
+    ),
+    work(
+      "Kool",
+      "Graphic design",
+      "coral",
+      "image (12).png",
+      "A single white script wordmark on a flat orange field.",
+    ),
+    work(
+      "MS General",
+      "Graphic design",
+      "cyan",
+      "image (13).png",
+      "A cleaning mark: buildings, a house and a squeegee, for MS General.",
+    ),
+    work(
+      "Carlos Tuning",
+      "Graphic design",
+      "coral",
+      "image (14).png",
+      "A speedometer car and a red wordmark for an auto tuning brand.",
+    ),
+    work(
+      "Cuzin's Duzin",
+      "Graphic design",
+      "pink",
+      "image (15).png",
+      "A sprinkled donut and a block wordmark on magenta.",
+    ),
+    work(
+      "Technofy Labs",
+      "Website development",
+      "coral",
+      "image (16).png",
+      "A long agency site. The card shows the hero. Open it and scroll the rest of the page.",
+      true,
+    ),
+    work(
+      "Chapter Bookshop",
+      "Website development",
+      "violet",
+      "image (17).png",
+      "A bookshop site. The card keeps the hero. The popup scrolls the full page.",
+      true,
+    ),
+    work(
+      "Pampered Paws",
+      "Website development",
+      "amber",
+      "image (18).png",
+      "A pet-grooming site. The card shows the hero. Scroll the rest in the popup.",
+      true,
+    ),
+    work(
+      "Hospitality Insights",
+      "Website development",
+      "violet",
+      "image (19).png",
+      "A consulting site for hospitality businesses. Open it to scroll past the hero.",
+      true,
+    ),
+    work(
+      "Pampered Paws page",
+      "Website development",
+      "amber",
+      "image (20).png",
+      "A full-page view of Pampered Paws. The hero stays on the card. The page scrolls in the popup.",
+      true,
+    ),
+    work(
+      "Pickup Pals",
+      "Website development",
+      "pink",
+      "image (21).png",
+      "A children's book site. The card shows the opening. Scroll the rest in the popup.",
+      true,
+    ),
+    work(
+      "Tutor Next",
+      "Website development",
+      "amber",
+      "image (22).png",
+      "A learning site homepage: courses, certification and a place to start.",
+    ),
+    work(
+      "MS General Cleaning",
+      "Website development",
+      "cyan",
+      "image (23).png",
+      "A cleaning and maintenance site. The hero stays on the card. The full page scrolls in the popup.",
+      true,
+    ),
+    work(
+      "The Coffee Shop",
+      "Website development",
+      "amber",
+      "image (24).png",
+      "A coffee shop page. The card shows the hero. Open it to scroll the products below.",
+      true,
+    ),
+    work(
+      "Vale",
+      "Website development",
+      "violet",
+      "image (25).png",
+      "A medical treatments homepage, with the offer and the treatment list on one screen.",
+    ),
+    work(
+      "Technofy Labs hero",
+      "Website development",
+      "coral",
+      "image (26).png",
+      "The Technofy Labs opening screen, with the services sitting on the headline.",
+    ),
   ] satisfies ShowcaseItem[],
 };
 

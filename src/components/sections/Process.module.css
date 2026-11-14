@@ -21,8 +21,16 @@
     padding-bottom: clamp(56px, 8vw, 96px);
   }
   
-  .head {
+   .head {
     flex: none;
+  }
+
+  .intro {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
   }
   
   .viewport {

@@ -2,9 +2,77 @@
    font-size and line-height are important so they win whether or not
    this module is layered above the Tailwind utilities. Letter-spacing
    stays normal so the accent word can keep its own tracking. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.mail {
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1rem + 1vw, 1.85rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  color: var(--fg);
+}
+
+.intro {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  max-width: none;
+}
+
+.addressLine {
+  min-width: 0;
+}
+
 .display {
-  font-size: clamp(2.75rem, 1.2rem + 6.4vw, 8rem) !important;
-  line-height: 0.95 !important;
+  font-size: clamp(2.35rem, 1rem + 4.2vw, 5.75rem) !important;
+  line-height: 0.98 !important;
   letter-spacing: -0.04em;
-  max-width: min(12ch, 100%);
+  max-width: min(14ch, 100%);
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.copy,
+.formCol,
+.details {
+  min-width: 0;
+}
+
+.details {
+  margin-top: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    gap: clamp(32px, 3vw, 56px);
+  }
+
+  .copy,
+  .formCol {
+    width: 100%;
+  }
+
+  .intro,
+  .addressLine {
+    white-space: nowrap;
+  }
 }

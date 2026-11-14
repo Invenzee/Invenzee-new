@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { headingText, markerHex, services } from "@/content/site";
+import { markerHex, services } from "@/content/site";
 import { Artwork } from "@/components/ui/Artwork";
 import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
@@ -293,22 +293,18 @@ function ServiceCard({ index, stacked = false }: { index: number; stacked?: bool
               aria-hidden="true"
               className={`${styles.art} ${itemIndex === index ? styles.artOn : styles.artOff}`}
             >
-              <Artwork variant={item.art} tone={item.tone} className="absolute inset-0" />
+              {item.image ? (
+                <img src={item.image} alt="" className={styles.photo} />
+              ) : (
+                <Artwork variant={item.art} tone={item.tone} className="absolute inset-0" />
+              )}
             </div>
           ))
+        ) : service.image ? (
+          <img src={service.image} alt="" className={styles.photo} />
         ) : (
           <Artwork variant={service.art} tone={service.tone} className="absolute inset-0" />
         )}
-        <div className={styles.caption}>
-          <span className="t-label">{headingText(service.title)}</span>
-          <span className={`t-label tabular-nums ${styles.count}`}>
-            {pad(index + 1)}
-            <span aria-hidden="true" className="px-[0.45em] text-signal">
-              /
-            </span>
-            {pad(count)}
-          </span>
-        </div>
       </div>
     </div>
   );

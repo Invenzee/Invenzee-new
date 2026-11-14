@@ -391,7 +391,7 @@ export function Process() {
                 <Label>{process.label}</Label>
                 <Heading parts={process.heading} as="h2" className="t-h2 mt-4 max-w-[16ch]" />
               </div>
-              <p className="t-lead col-span-12 text-fg-2 lg:col-span-4 lg:col-start-9">{process.intro}</p>
+              <p className={`${styles.intro} col-span-12 text-fg-2 lg:col-span-4 lg:col-start-9`}>{process.intro}</p>
             </div>
           </div>
 

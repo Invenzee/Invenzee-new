@@ -330,7 +330,7 @@ function WorkCard({
     <article className={styles.card} data-open={open ? "true" : undefined}>
       <button type="button" className={styles.open} onClick={onOpen}>
         <span className={styles.frame}>
-          <WorkVisual item={item} />
+          <WorkVisual item={item} hero />
           <span className={styles.shine} aria-hidden="true" />
           <span className={styles.view}>View Project</span>
         </span>
@@ -351,9 +351,15 @@ function WorkCard({
   );
 }
 
-function WorkVisual({ item }: { item: ShowcaseItem }) {
+function WorkVisual({ item, hero = false }: { item: ShowcaseItem; hero?: boolean }) {
   if (item.image) {
-    return <img src={item.image} alt="" className={styles.photo} />;
+    return (
+      <img
+        src={item.image}
+        alt=""
+        className={hero && item.long ? `${styles.photo} ${styles.hero}` : styles.photo}
+      />
+    );
   }
   return <Artwork variant={item.art} tone={item.tone} className="h-full w-full" />;
 }
@@ -413,7 +419,7 @@ function WorkDialog({ item, onClose }: { item: ShowcaseItem; onClose: () => void
           Close
         </button>
         <div className={styles.body} data-lenis-prevent>
-          <div className={styles.shot}>
+          <div className={item.long ? styles.longShot : styles.shot}>
             <WorkVisual item={item} />
           </div>
           <p className={`t-label ${styles.dialogLabel}`}>

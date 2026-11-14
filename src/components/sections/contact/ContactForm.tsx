@@ -5,8 +5,6 @@ import { ArrowIcon } from "@/components/ui/Button";
 import { contact, headingText, services, site } from "@/content/site";
 import styles from "./ContactForm.module.css";
 
-const controlClass = `${styles.control} w-full min-w-0 appearance-none bg-transparent py-[14px] font-display text-[1.25rem] leading-[1.15] font-medium tracking-[-0.02em] text-fg placeholder:text-fg-3`;
-
 function Field({
   id,
   label,
@@ -17,20 +15,11 @@ function Field({
   children: ReactNode;
 }) {
   return (
-    <div className="group/field min-w-0">
-      <label
-        htmlFor={id}
-        className="t-label text-fg-3 transition-colors duration-500 ease-expo group-focus-within/field:text-fg"
-      >
+    <div className={styles.field}>
+      <label htmlFor={id} className={`t-label ${styles.label}`}>
         {label}
       </label>
-      <div className="relative mt-2">
-        {children}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-cyan transition-transform duration-500 ease-expo group-focus-within/field:scale-x-100"
-        />
-      </div>
+      <div className={styles.box}>{children}</div>
     </div>
   );
 }
@@ -40,7 +29,7 @@ function Chevron() {
     <svg
       viewBox="0 0 16 16"
       aria-hidden="true"
-      className="pointer-events-none absolute top-1/2 right-0 size-4 -translate-y-1/2 text-fg-3"
+      className={`pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-fg-3`}
     >
       <path
         d="M3.5 6.25 8 10.75 12.5 6.25"
@@ -75,8 +64,8 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-(--g) md:grid-cols-2">
+    <form onSubmit={onSubmit} className={styles.panel}>
+      <div className={styles.row}>
         <Field id="contact-name" label={contact.form.name}>
           <input
             id="contact-name"
@@ -84,7 +73,7 @@ export function ContactForm() {
             type="text"
             required
             autoComplete="name"
-            className={controlClass}
+            className={styles.control}
           />
         </Field>
         <Field id="contact-email" label={contact.form.email}>
@@ -94,7 +83,7 @@ export function ContactForm() {
             type="email"
             required
             autoComplete="email"
-            className={controlClass}
+            className={styles.control}
           />
         </Field>
       </div>
@@ -103,7 +92,7 @@ export function ContactForm() {
           id="contact-service"
           name="service"
           defaultValue={contact.form.serviceFallback}
-          className={`${controlClass} cursor-pointer pr-8`}
+          className={`${styles.control} ${styles.select}`}
         >
           <option value={contact.form.serviceFallback}>
             {contact.form.serviceFallback}
@@ -122,10 +111,10 @@ export function ContactForm() {
           name="message"
           required
           rows={4}
-          className={`${controlClass} resize-y`}
+          className={`${styles.control} ${styles.area}`}
         />
       </Field>
-      <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className={styles.actions}>
         <button
           type="submit"
           className="group/btn mark inline-flex h-14 shrink-0 appearance-none items-center gap-3 border-0 bg-cyan pr-2 pl-7 font-display text-[1.0625rem] font-semibold tracking-[-0.01em] whitespace-nowrap text-navy transition-colors duration-300 hover:bg-cyan-bright [--chip:var(--color-navy)] [--chip-fg:#fff] [--chip-size:2.5rem]"
