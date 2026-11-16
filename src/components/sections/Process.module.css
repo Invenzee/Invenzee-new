@@ -38,7 +38,7 @@
     --card-w: min(78vw, 340px);
     --start: var(--m);
     --stagger: 100px;
-    --fill: var(--signal); /* line and card fill are the same theme colour */
+    --fill: var(--color-navy); /* line and card fill are #101145 */
     position: relative;
     min-width: 0;
     overflow-x: auto;
@@ -139,9 +139,9 @@
       linear-gradient(90deg, color-mix(in srgb, white 22%, transparent) 0, transparent 28%),
       linear-gradient(
         180deg,
-        color-mix(in srgb, var(--fill) 70%, white) 0,
+        color-mix(in srgb, var(--fill) 55%, white) 0,
         var(--fill) 22px,
-        color-mix(in srgb, var(--fill) 84%, #062029) 100%
+        var(--fill) 100%
       );
     transform: translate3d(0, 101%, 0);
     transition: transform 1.8s cubic-bezier(0.22, 0.5, 0.28, 1);

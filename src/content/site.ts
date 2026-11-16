@@ -46,8 +46,8 @@ export const site = {
     "Invenzee is an all-in-one digital agency: marketing, SEO and PPC, graphic design, website and software development, video editing and illustration, under one roof.",
   email: "info@invenzee.com",
   phones: [
-    { label: "USA", display: "+1-424-424-5752", href: "tel:+14244245752" },
-    { label: "PK", display: "+92 331-4302109", href: "tel:+923314302109" },
+    { label: "USA", flag: "US", display: "+1-424-424-5752", href: "tel:+14244245752" },
+    { label: "PK", flag: "PK", display: "+92 331-4302109", href: "tel:+923314302109" },
   ],
   address: {
     lines: ["502, 5th Floor, Emarah Suites", "Karachi, Pakistan"],
@@ -56,18 +56,17 @@ export const site = {
   },
   /* Live clocks shown in the hero bar and footer */
   clocks: [
-    { city: "Karachi", code: "KHI", timeZone: "Asia/Karachi" },
-    { city: "United States", code: "USA", timeZone: "America/Los_Angeles" },
+    { city: "Karachi", code: "KHI", flag: "PK", timeZone: "Asia/Karachi" },
+    { city: "United States", code: "USA", flag: "US", timeZone: "America/Los_Angeles" },
   ],
 } as const;
 
 export const nav = {
   links: [
-    { label: "Services", href: "#services" },
+    { label: "Services", href: "#services", menu: "services" },
     { label: "Work", href: "#work" },
     { label: "Process", href: "#process" },
-    { label: "About", href: "#about" },
-    { label: "FAQ", href: "#faq" },
+    { label: "About", href: "#about", menu: "about" },
   ],
   cta: { label: "Start a project", href: "#contact" },
 } as const;
@@ -255,6 +254,39 @@ export const services = {
     },
   ] satisfies Service[],
 };
+
+export const navMenus = {
+  services: {
+    title: ["Pick one. ", { accent: "Or all six." }] satisfies HeadingPart[],
+    cta: { label: "All services", href: "#services" },
+    items: services.list.map((service) => ({
+      href: "#services",
+      title: headingText(service.title),
+      image: service.image,
+    })),
+  },
+  about: {
+    title: ["Meet the", { accent: "studio." }] satisfies HeadingPart[],
+    cta: { label: "About the agency", href: "#about" },
+    items: [
+      {
+        href: "#about",
+        title: "About us",
+        text: "Our team, one brief, Karachi and the USA",
+      },
+      {
+        href: "#process",
+        title: "How we work",
+        text: "From brief to launch in six moves",
+      },
+      {
+        href: "#contact",
+        title: "Get in touch",
+        text: "Address, mailbox and phone",
+      },
+    ],
+  },
+} as const;
 
 /** A block inside a work dialog. Add as many as you need, in any order. */
 export type WorkBlock =

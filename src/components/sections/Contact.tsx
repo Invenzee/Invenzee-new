@@ -1,4 +1,5 @@
 import { ArrowIcon } from "@/components/ui/Button";
+import { Flag } from "@/components/ui/Flag";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
 import { Reveal } from "@/components/ui/Reveal";
@@ -53,7 +54,7 @@ export function Contact() {
                 {site.phones.map((phone) => (
                   <li
                     key={phone.href}
-                    className="flex flex-wrap items-baseline gap-x-3 gap-y-1"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1"
                   >
                     <a
                       href={phone.href}
@@ -62,7 +63,7 @@ export function Contact() {
                       {phone.display}
                       <span className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-cyan transition-transform duration-500 ease-expo group-hover:scale-x-100 group-focus-visible:scale-x-100" />
                     </a>
-                    <span className="t-label text-fg-3">({phone.label})</span>
+                    <Flag code={phone.flag} />
                   </li>
                 ))}
               </ul>

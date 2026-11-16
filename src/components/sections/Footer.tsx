@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { CurrentYear, LiveClock } from "@/components/ui/LiveClock";
+import { Flag } from "@/components/ui/Flag";
 import { Logo } from "@/components/ui/Logo";
 import { ServiceIcon } from "@/components/ui/ServiceIcon";
-import { contact, footer, headingText, markerHex, nav, services, site } from "@/content/site";
+import { contact, faq, footer, headingText, markerHex, nav, services, site } from "@/content/site";
 import { BackToTop } from "./footer/BackToTop";
 import { Wordmark } from "./footer/Wordmark";
 
@@ -72,6 +73,9 @@ export function Footer() {
                 </li>
               ))}
               <li>
+                <TextLink href={`#${faq.id}`}>FAQ</TextLink>
+              </li>
+              <li>
                 <TextLink href={`#${contact.id}`}>Contact</TextLink>
               </li>
             </ul>
@@ -86,10 +90,10 @@ export function Footer() {
               {site.phones.map((phone) => (
                 <li
                   key={phone.href}
-                  className="flex flex-wrap items-baseline gap-x-2 gap-y-1"
+                  className="flex flex-wrap items-center gap-x-2 gap-y-1"
                 >
                   <TextLink href={phone.href}>{phone.display}</TextLink>
-                  <span className="t-label text-fg-3">{phone.label}</span>
+                  <Flag code={phone.flag} />
                 </li>
               ))}
             </ul>
@@ -109,9 +113,9 @@ export function Footer() {
                 {site.clocks.map((clock) => (
                   <li
                     key={clock.timeZone}
-                    className="flex flex-wrap items-baseline gap-x-3 gap-y-1"
+                    className="flex flex-wrap items-center gap-x-3 gap-y-1"
                   >
-                    <span className="t-label text-fg-3">{clock.city}</span>
+                    <Flag code={clock.flag} />
                     <LiveClock
                       timeZone={clock.timeZone}
                       className="t-label text-cyan"

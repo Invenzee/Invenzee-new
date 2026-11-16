@@ -58,9 +58,9 @@
 
 .shell[data-condensed="true"] {
   justify-content: flex-start;
-  gap: 14px;
+  gap: 40px;
   width: max-content;
-  max-width: min(820px, calc(100vw - 24px));
+  max-width: min(1040px, calc(100vw - 32px));
   height: 56px;
   margin-top: 12px;
   padding-left: 10px;
@@ -97,15 +97,16 @@
 }
 
 .desktop {
+  position: relative;
   display: none;
   align-items: center;
-  gap: clamp(1.25rem, 2vw, 2.25rem);
+  gap: clamp(2.25rem, 3.2vw, 3.5rem);
 }
 
 .list {
   display: flex;
   align-items: center;
-  gap: clamp(1.1rem, 1.6vw, 1.75rem);
+  gap: clamp(1.5rem, 2.1vw, 2.25rem);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -113,6 +114,8 @@
 
 .link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   padding-block: 4px;
   color: var(--fg-2);
   font-family: var(--font-display);
@@ -120,29 +123,244 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   text-decoration: none;
+  transition: color 0.35s var(--ease-expo);
 }
 
-.link::after {
-  content: "";
+.linkMark {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  top: 50%;
   left: 0;
-  height: 1px;
+  width: 6px;
+  height: 6px;
   background: var(--color-cyan);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.5s var(--ease-expo);
+  transform: translate(-12px, -50%) scale(0);
+  transform-origin: top center;
+  transition: transform 0.45s var(--ease-expo);
 }
 
 .link:hover,
-.link:focus-visible {
+.link:focus-visible,
+.link[data-open="true"] {
   color: var(--fg);
 }
 
-.link:hover::after,
-.link:focus-visible::after {
-  transform: scaleX(1);
+.link:hover .linkMark,
+.link:focus-visible .linkMark,
+.link[data-open="true"] .linkMark {
+  transform: translate(-12px, -50%) scale(1);
+}
+
+.panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  padding-top: 14px;
+  transform-origin: top center;
+  animation: panelIn 0.5s var(--ease-expo) both;
+}
+
+@keyframes panelIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.panelCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 28px;
+  padding: 28px 28px 22px;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-ink-2) 92%, transparent);
+  box-shadow: 0 28px 70px rgb(0 0 0 / 0.38);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.panelLead {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 100%;
+}
+
+.panelTitle {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 1.2rem + 1vw, 2.15rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.titleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.mark {
+  display: inline-block;
+  width: 0.28em;
+  height: 0.28em;
+  margin-left: 0.12em;
+  background: var(--color-cyan);
+  vertical-align: 0.12em;
+}
+
+.panelCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.7);
+  padding-bottom: 2px;
+}
+
+.panelCta:hover,
+.panelCta:focus-visible {
+  color: var(--color-cyan);
+  border-bottom-color: var(--color-cyan);
+}
+
+.panelList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panelItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 0;
+  text-decoration: none;
+}
+
+.panelItemTitle {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.panelItemTitle::before,
+.serviceName::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-right: -7px;
+  background: var(--color-cyan);
+  transform: scale(0);
+  transform-origin: top center;
+  transition:
+    transform 0.45s var(--ease-expo),
+    margin-right 0.45s var(--ease-expo);
+}
+
+.panelItemText {
+  color: rgb(255 255 255 / 0.55);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.panelItem:hover .panelItemTitle,
+.panelItem:focus-visible .panelItemTitle {
+  color: #fff;
+}
+
+.panelItem:hover .panelItemTitle::before,
+.panelItem:focus-visible .panelItemTitle::before {
+  margin-right: 10px;
+  transform: scale(1);
+}
+
+.servicesCard {
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 46%);
+  gap: 0;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.serviceCopy {
+  padding: 28px 28px 28px 32px;
+}
+
+.serviceNames {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.serviceName {
+  display: inline-flex;
+  align-items: center;
+  color: rgb(255 255 255 / 0.72);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  transition: color 0.35s var(--ease-expo);
+}
+
+.serviceName:hover,
+.serviceName:focus-visible,
+.serviceName[data-active="true"] {
+  color: #fff;
+}
+
+.serviceName:hover::before,
+.serviceName:focus-visible::before,
+.serviceName[data-active="true"]::before {
+  margin-right: 10px;
+  transform: scale(1);
+}
+
+.serviceVisual {
+  position: relative;
+  min-height: 320px;
+  background: var(--color-ink);
+}
+
+.serviceImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(0);
+  transform-origin: top center;
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.serviceImage[data-active="true"] {
+  transform: scale(1);
 }
 
 .mobile {
@@ -242,17 +460,31 @@
 }
 
 .menuLink {
-  display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--color-white);
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: var(--t-h2);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
   opacity: 0;
   transform: translateY(28px);
   transition:
     transform 0.7s var(--ease-expo),
     opacity 0.6s var(--ease-expo),
-    color 0.3s var(--ease-expo);
+    color 0.3s var(--ease-expo),
+    gap 0.45s var(--ease-expo);
 }
 
 .menu[data-open="true"] .menuLink {
@@ -262,17 +494,109 @@
 }
 
 .menuLink:hover,
-.menuLink:focus-visible {
+.menuLink:focus-visible,
+.menuLink[data-open="true"] {
   color: var(--color-cyan-bright);
 }
 
-.index {
+.menuMark {
   flex: none;
-  color: var(--fg-3, color-mix(in srgb, var(--color-white) 50%, transparent));
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  width: 8px;
+  height: 8px;
+  margin-right: -8px;
+  background: var(--color-cyan);
+  transform: scale(0);
+  transform-origin: top center;
+  transition:
+    transform 0.45s var(--ease-expo),
+    margin-right 0.45s var(--ease-expo);
+}
+
+.menuLink:hover .menuMark,
+.menuLink:focus-visible .menuMark,
+.menuLink[data-open="true"] .menuMark {
+  margin-right: 12px;
+  transform: scale(1);
+}
+
+.sub {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s var(--ease-expo);
+}
+
+.sub[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.subInner {
+  overflow: hidden;
+}
+
+.subPanel {
+  padding: 8px 0 18px;
+}
+
+.subVisual {
+  position: relative;
+  height: 148px;
+  margin: 14px 0 12px;
+  overflow: hidden;
+  background: var(--color-ink-3);
+}
+
+.subImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(0);
+  transform-origin: top center;
+  transition: transform 0.5s var(--ease-expo);
+}
+
+.subImage[data-active="true"] {
+  transform: scale(1);
+}
+
+.subList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.subLink {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  color: rgb(255 255 255 / 0.72);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.subText {
+  color: rgb(255 255 255 / 0.48);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.subLink:hover,
+.subLink:focus-visible,
+.subLink[data-active="true"] {
+  color: var(--color-cyan);
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
 }
 
 .foot {
@@ -317,6 +641,9 @@
 }
 
 .phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--fg-2);
   font-variant-numeric: tabular-nums;
   text-decoration: none;
@@ -358,10 +685,15 @@
   .header:not([data-shown="true"]) .shell,
   .menu,
   .menuLink,
-  .foot {
+  .foot,
+  .panel {
     transform: none;
     opacity: 1;
     animation: none;
+    transition: none;
+  }
+
+  .serviceImage {
     transition: none;
   }
 
