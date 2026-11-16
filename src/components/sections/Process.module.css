@@ -2,7 +2,7 @@
    Six cards in a zig-zag: 1, 3, 5 sit high, 2, 4, 6 sit lower.
    The route runs behind the cards. When it reaches a card it splits in two,
    the two strokes wrap round the card as its border and meet on the far side,
-   then that same colour fills the card from the bottom, like glass, and the route carries on. */
+   then that same colour fills the card from the bottom, and the route carries on. */
 
    .section {
     max-width: 100%;
@@ -123,8 +123,7 @@
     margin-top: var(--stagger);
   }
   
-  /* Glass filling from the bottom. The light band is the surface of the glass.
-     Pulled 1px past the edge so it sits under the stroke, with no hairline gap. */
+  /* Solid fill from the bottom. Pulled 1px past the edge so it sits under the stroke. */
   .card::before {
     content: "";
     position: absolute;
@@ -134,15 +133,7 @@
     left: -1px;
     height: calc(100% + 2px);
     border-radius: inherit;
-    background:
-      radial-gradient(90% 16px at 50% 0, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 72%),
-      linear-gradient(90deg, color-mix(in srgb, white 22%, transparent) 0, transparent 28%),
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--fill) 55%, white) 0,
-        var(--fill) 22px,
-        var(--fill) 100%
-      );
+    background: var(--fill);
     transform: translate3d(0, 101%, 0);
     transition: transform 1.8s cubic-bezier(0.22, 0.5, 0.28, 1);
   }

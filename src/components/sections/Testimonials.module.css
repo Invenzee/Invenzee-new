@@ -1,0 +1,294 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  padding-block: var(--sec);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: clamp(36px, 5vw, 72px);
+}
+
+.copy {
+  min-width: 0;
+}
+
+.title {
+  max-width: 10ch;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stage::before,
+.stage::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: min(160px, 14vw);
+  pointer-events: none;
+}
+
+.stage::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--color-ink) 0%, rgb(7 8 28 / 0) 100%);
+  backdrop-filter: blur(10px);
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+}
+
+.stage::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--color-ink) 0%, rgb(7 8 28 / 0) 100%);
+  backdrop-filter: blur(10px);
+  mask-image: linear-gradient(270deg, #000 0%, transparent 100%);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: drift 55s linear infinite;
+}
+
+.stage:hover .track {
+  animation-play-state: paused;
+}
+
+.group {
+  display: flex;
+  flex: none;
+  gap: 16px;
+  padding-right: 16px;
+}
+
+.quoteCard,
+.photoCard {
+  flex: 0 0 calc((100vw - 48px) / 4);
+  width: calc((100vw - 48px) / 4);
+}
+
+.quoteCard {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 460px;
+  padding: 22px 22px 20px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 1.5rem;
+  background: var(--color-ink-3);
+  color: inherit;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.name,
+.photoName {
+  display: block;
+  min-width: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.role,
+.photoRole {
+  display: block;
+  margin-top: 2px;
+  color: rgb(255 255 255 / 0.55);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+}
+
+.quote {
+  display: block;
+  flex: 1;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 0.95rem + 0.5vw, 1.4rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.stars {
+  display: inline-flex;
+  flex: none;
+  gap: 3px;
+  color: #f5c518;
+}
+
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: rgb(255 255 255 / 0.72);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+}
+
+.photoCard {
+  position: relative;
+  min-height: 460px;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: var(--color-ink-2);
+}
+
+.photoCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.photoCard::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 96px;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.62), transparent);
+  pointer-events: none;
+}
+
+.photoMeta {
+  position: absolute;
+  top: 22px;
+  right: 18px;
+  left: 22px;
+  z-index: 2;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.55);
+}
+
+.photoFoot {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.photoFoot .place {
+  color: #fff;
+}
+
+.photoName {
+  font-size: 1.05rem;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (max-width: 1200px) {
+  .quoteCard,
+  .photoCard {
+    flex-basis: calc((100vw - 32px) / 3);
+    width: calc((100vw - 32px) / 3);
+  }
+}
+
+@media (max-width: 900px) {
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    max-width: 12ch;
+  }
+
+  .track {
+    animation-duration: 70s;
+  }
+
+  .stage::before,
+  .stage::after {
+    width: 72px;
+  }
+
+  .quoteCard,
+  .photoCard {
+    flex-basis: calc((100vw - 16px) / 2);
+    width: calc((100vw - 16px) / 2);
+    min-height: 400px;
+  }
+
+  .quote {
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .quoteCard,
+  .photoCard {
+    flex-basis: calc(100vw - 56px);
+    width: calc(100vw - 56px);
+    min-height: 360px;
+    padding: 16px;
+  }
+
+  .photoCard {
+    padding: 0;
+  }
+
+  .name,
+  .photoName {
+    font-size: 0.95rem;
+  }
+
+  .stage::before,
+  .stage::after {
+    width: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

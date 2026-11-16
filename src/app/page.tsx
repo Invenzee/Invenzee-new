@@ -3,7 +3,7 @@ import { Contact } from "@/components/sections/Contact";
 import { Faq } from "@/components/sections/Faq";
 import { Footer } from "@/components/sections/Footer";
 import { Hero } from "@/components/sections/Hero";
-import { MarqueeBand } from "@/components/sections/MarqueeBand";
+import { Testimonials } from "@/components/sections/Testimonials";
 import { Nav } from "@/components/sections/Nav";
 import { Preloader } from "@/components/sections/Preloader";
 import { Process } from "@/components/sections/Process";
@@ -29,7 +29,7 @@ export default function Home() {
         <Services />
         <Showcase />
         <Process />
-        <MarqueeBand />
+        <Testimonials />
         <Faq />
         <Contact />
       </main>

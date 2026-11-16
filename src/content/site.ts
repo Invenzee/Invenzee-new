@@ -576,6 +576,70 @@ export const process = {
   ],
 };
 
+export const testimonials = {
+  id: "testimonials",
+  label: "Testimonials",
+  heading: ["Notes from ", { accent: "the work." }] satisfies HeadingPart[],
+  intro:
+    "A few notes from people we have built with. The line turns on its own, or pick a face.",
+  people: [
+    {
+      name: "Amina Rahman",
+      role: "Founder",
+      place: "Karachi",
+      flag: "PK" as const,
+      image: "/testimonials/amina-rahman.jpg",
+      quote:
+        "One brief covered the brand, the site and the launch films. Nothing had to be explained twice.",
+    },
+    {
+      name: "Daniel Cho",
+      role: "Marketing lead",
+      place: "Los Angeles",
+      flag: "US" as const,
+      image: "/testimonials/daniel-cho.jpg",
+      quote:
+        "They treated the campaign and the product as one story. The work arrived looking like it came from a single team.",
+    },
+    {
+      name: "Sofia Almeida",
+      role: "Product owner",
+      place: "Lisbon",
+      flag: "PT" as const,
+      image: "/testimonials/sofia-almeida.jpg",
+      quote:
+        "The scope was clear before anyone opened a file. We always knew what was next, and what it would cost.",
+    },
+    {
+      name: "Omar Farooq",
+      role: "Studio director",
+      place: "Dubai",
+      flag: "AE" as const,
+      image: "/testimonials/omar-farooq.jpg",
+      quote:
+        "Design, code and motion sat in the same thread. Reviews were short because the work was already aligned.",
+    },
+    {
+      name: "Lena Vogel",
+      role: "Editor",
+      place: "Berlin",
+      flag: "DE" as const,
+      image: "/testimonials/lena-vogel.jpg",
+      quote:
+        "The edits matched the brand we had just drawn. It felt like the same hands were on both.",
+    },
+    {
+      name: "James Okonkwo",
+      role: "Founder",
+      place: "London",
+      flag: "GB" as const,
+      image: "/testimonials/james-okonkwo.jpg",
+      quote:
+        "We started with a site and stayed for the campaigns. The handoff between disciplines never showed.",
+    },
+  ],
+};
+
 export const marquee = {
   words: [
     "Branding",

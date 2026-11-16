@@ -1,8 +1,14 @@
-type FlagCode = "US" | "PK";
+import type { ReactElement } from "react";
+
+type FlagCode = "US" | "PK" | "PT" | "AE" | "DE" | "GB";
 
 const names: Record<FlagCode, string> = {
   US: "United States",
   PK: "Pakistan",
+  PT: "Portugal",
+  AE: "United Arab Emirates",
+  DE: "Germany",
+  GB: "United Kingdom",
 };
 
 function UsFlag() {
@@ -52,8 +58,66 @@ function PkFlag() {
   );
 }
 
+function PtFlag() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#FF0000" />
+      <rect width="9.6" height="16" fill="#006600" />
+      <circle cx="9.6" cy="8" r="2.7" fill="#FFCC00" />
+      <circle cx="9.6" cy="8" r="1.45" fill="#003399" />
+    </>
+  );
+}
+
+function AeFlag() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#00732F" />
+      <rect y="5.33" width="24" height="5.34" fill="#fff" />
+      <rect y="10.67" width="24" height="5.33" fill="#000" />
+      <rect width="6" height="16" fill="#FF0000" />
+    </>
+  );
+}
+
+function DeFlag() {
+  return (
+    <>
+      <rect width="24" height="5.33" fill="#000" />
+      <rect y="5.33" width="24" height="5.34" fill="#DD0000" />
+      <rect y="10.67" width="24" height="5.33" fill="#FFCE00" />
+    </>
+  );
+}
+
+function GbFlag() {
+  return (
+    <>
+      <rect width="24" height="16" fill="#012169" />
+      <polygon points="0,0 4,0 24,13.4 24,16 20,16 0,2.6" fill="#fff" />
+      <polygon points="24,0 20,0 0,13.4 0,16 4,16 24,2.6" fill="#fff" />
+      <polygon points="0,0 2.1,0 24,14.6 24,16 21.9,16 0,1.4" fill="#C8102E" />
+      <polygon points="24,0 21.9,0 0,14.6 0,16 2.1,16 24,1.4" fill="#C8102E" />
+      <rect x="9.6" width="4.8" height="16" fill="#fff" />
+      <rect y="5.6" width="24" height="4.8" fill="#fff" />
+      <rect x="10.8" width="2.4" height="16" fill="#C8102E" />
+      <rect y="6.8" width="24" height="2.4" fill="#C8102E" />
+    </>
+  );
+}
+
+const shapes: Record<FlagCode, () => ReactElement> = {
+  US: UsFlag,
+  PK: PkFlag,
+  PT: PtFlag,
+  AE: AeFlag,
+  DE: DeFlag,
+  GB: GbFlag,
+};
+
 /** Small country flag. Used in place of USA / PK and the city names. */
 export function Flag({ code }: { code: FlagCode }) {
+  const Shape = shapes[code];
   return (
     <svg
       viewBox="0 0 24 16"
@@ -63,7 +127,7 @@ export function Flag({ code }: { code: FlagCode }) {
       aria-label={names[code]}
       className="inline-block shrink-0 rounded-[2px] shadow-[0_0_0_1px_rgb(255_255_255/0.28)]"
     >
-      {code === "US" ? <UsFlag /> : <PkFlag />}
+      <Shape />
     </svg>
   );
 }
