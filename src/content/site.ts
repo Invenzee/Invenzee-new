@@ -644,6 +644,13 @@ export const aboutPage = {
         image: teamPhoto("Studio Portrait of Man Wearing Invenzee T-Shirt.png"),
       },
       {
+        role: "Abdul Rehman",
+        job: "Senior Marketing Manager",
+        handle: "marketing-lead",
+        icon: "marketing",
+        image: teamPhoto("Confident Corporate Portrait with Gold Watch.png"),
+      },
+      {
         role: "Muhammad Ukasha",
         job: "Full Stack Developer",
         handle: "studio",
