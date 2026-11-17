@@ -63,12 +63,12 @@ export const site = {
 
 export const nav = {
   links: [
-    { label: "Services", href: "#services", menu: "services" },
-    { label: "Work", href: "#work" },
-    { label: "Process", href: "#process" },
-    { label: "About", href: "#about", menu: "about" },
+    { label: "Services", href: "/#services", menu: "services" },
+    { label: "Work", href: "/#work" },
+    { label: "Process", href: "/#process" },
+    { label: "About", href: "/about", menu: "about" },
   ],
-  cta: { label: "Start a project", href: "#contact" },
+  cta: { label: "Start a project", href: "/#contact" },
 } as const;
 
 export const hero = {
@@ -258,29 +258,29 @@ export const services = {
 export const navMenus = {
   services: {
     title: ["Pick one. ", { accent: "Or all six." }] satisfies HeadingPart[],
-    cta: { label: "All services", href: "#services" },
+    cta: { label: "All services", href: "/#services" },
     items: services.list.map((service) => ({
-      href: "#services",
+      href: "/#services",
       title: headingText(service.title),
       image: service.image,
     })),
   },
   about: {
     title: ["Meet the", { accent: "studio." }] satisfies HeadingPart[],
-    cta: { label: "About the agency", href: "#about" },
+    cta: { label: "About the agency", href: "/about" },
     items: [
       {
-        href: "#about",
+        href: "/about",
         title: "About us",
-        text: "Our team, one brief, Karachi and the USA",
+        text: "The studio, the path, and the team",
       },
       {
-        href: "#process",
+        href: "/#process",
         title: "How we work",
         text: "From brief to launch in six moves",
       },
       {
-        href: "#contact",
+        href: "/#contact",
         title: "Get in touch",
         text: "Address, mailbox and phone",
       },
@@ -324,10 +324,7 @@ function work(
     tone: "ink",
     image: `/real%20project%20images/${encodeURIComponent(file)}`,
     ...(long ? { long: true } : {}),
-    blocks: [
-      { kind: "text", text: blurb },
-      { kind: "button", label: "Start a project", href: "#contact" },
-    ],
+    blocks: [{ kind: "button", label: "Start a project", href: "#contact" }],
   };
 }
 
@@ -344,112 +341,112 @@ export const showcase = {
       "Software development",
       "violet",
       "image (1).png",
-      "A matching app: welcome, login, discovery and chat, laid out as one product.",
+      "A dating app in four screens: a welcome, sign-in with email or social, a match card, and a live chat. Getting started, finding someone, and talking all sit in one product.",
     ),
     work(
       "City General Hospital",
       "Software development",
       "cyan",
       "image (2).png",
-      "A hospital app for getting started, signing in, booking a doctor and reading records.",
+      "A hospital app for City General: welcome, login, booking a doctor, and a patient’s records. Find a specialist, book a time, and review reports and medications from one place.",
     ),
     work(
       "Aurora",
       "Software development",
       "violet",
       "image (3).png",
-      "A digital wallet: the start screen, a balance, a secure PIN and sending money.",
+      "A digital wallet called Aurora. The set covers the start screen, a balance with cards, a secure PIN, and sending money. Send, receive, pay, and confirm live on one product.",
     ),
     work(
       "HomeHaven",
       "Software development",
       "cyan",
       "image (4).png",
-      "A stays app for finding a cabin, reading the listing and confirming a booking.",
+      "A stays app for finding a place to stay. Six screens take you from the welcome through search, the cabin listing, amenities, and a confirmed booking.",
     ),
     work(
       "Western Foods",
       "Graphic design",
       "coral",
       "image (5).png",
-      "A food mark built from a cloche and a sauce bottle, set in black and orange.",
+      "A food mark for Western Foods: a black cloche and an orange sauce bottle, with WESTERN in black and FOODS in orange underneath.",
     ),
     work(
       "Private Chef Wānaka",
       "Graphic design",
       "lime",
       "image (6).png",
-      "A mountain mark for a private chef, with a local and sustainable line underneath.",
+      "A mountain and sun mark on deep green for a private chef in Wānaka. The line underneath reads local, sustainable, and ethical.",
     ),
     work(
       "The Burger And Bowl",
       "Graphic design",
       "coral",
       "image (7).png",
-      "A burger illustration and a hand-lettered wordmark for a casual food brand.",
+      "A sesame burger illustration with a red script wordmark and a black “And Bowl” underneath, for a casual food brand.",
     ),
     work(
       "Just 4u By Ell",
       "Graphic design",
       "amber",
       "image (8).png",
-      "A leaf mark and a wordmark for an all-natural hair growth oil.",
+      "A green leaf mark and a white wordmark on brown for Just 4u By Ell, an all-natural hair growth oil.",
     ),
     work(
       "Liberty Tax",
       "Graphic design",
       "violet",
       "image (9).png",
-      "A navy and red mark pairing a house, an upward arrow and the Statue of Liberty.",
+      "A navy Statue of Liberty set inside a red house outline, with an upward arrow, above the Liberty Tax wordmark.",
     ),
     work(
       "Abritex",
       "Graphic design",
       "violet",
       "image (10).png",
-      "A wordmark with a gradient stroke for Abritex LLC.",
+      "A white wordmark on black for Abritex LLC, cut by a blue-to-purple stroke that runs through the letters.",
     ),
     work(
       "The Hero Project",
       "Graphic design",
       "coral",
       "image (11).png",
-      "A shield, a star and a rising arrow for a community project.",
+      "A black shield, three red figures, a rising arrow and a star, set above The Hero Project wordmark.",
     ),
     work(
       "Kool",
       "Graphic design",
       "coral",
       "image (12).png",
-      "A single white script wordmark on a flat orange field.",
+      "A single white script wordmark, underlined, on a flat orange field.",
     ),
     work(
       "MS General",
       "Graphic design",
       "cyan",
       "image (13).png",
-      "A cleaning mark: buildings, a house and a squeegee, for MS General.",
+      "A cleaning mark for MS General: city buildings, a house and a squeegee, with the company name set in blue underneath.",
     ),
     work(
       "Carlos Tuning",
       "Graphic design",
       "coral",
       "image (14).png",
-      "A speedometer car and a red wordmark for an auto tuning brand.",
+      "A silver speedometer drawn as a car, with a red Carlos wordmark and white Tuning underneath, for an auto tuning brand.",
     ),
     work(
       "Cuzin's Duzin",
       "Graphic design",
       "pink",
       "image (15).png",
-      "A sprinkled donut and a block wordmark on magenta.",
+      "A pink sprinkled donut above a silver block wordmark, set on magenta for Cuzin's Duzin.",
     ),
     work(
       "Technofy Labs",
       "Website development",
       "coral",
       "image (16).png",
-      "A long agency site. The card shows the hero. Open it and scroll the rest of the page.",
+      "A long agency site for Technofy Labs. It runs from the Create Impact hero through branding, design, marketing, portfolio, pricing, and a contact form. Scroll the full page here.",
       true,
     ),
     work(
@@ -457,7 +454,7 @@ export const showcase = {
       "Website development",
       "violet",
       "image (17).png",
-      "A bookshop site. The card keeps the hero. The popup scrolls the full page.",
+      "A bookshop site, Crafting Tales One Chapter at a Time. Featured books, bestsellers, news, and a newsletter run down the page. Scroll the full shop here.",
       true,
     ),
     work(
@@ -465,7 +462,7 @@ export const showcase = {
       "Website development",
       "amber",
       "image (18).png",
-      "A pet-grooming site. The card shows the hero. Scroll the rest in the popup.",
+      "A pet-grooming site for Pampered Paws: services, pricing, a gallery, owner reviews, and a mailing list. Open it and scroll from the welcome to the footer.",
       true,
     ),
     work(
@@ -473,7 +470,7 @@ export const showcase = {
       "Website development",
       "violet",
       "image (19).png",
-      "A consulting site for hospitality businesses. Open it to scroll past the hero.",
+      "A consulting site for hospitality businesses. Solutions, calculations, services, a contact form, and client logos sit on one long page.",
       true,
     ),
     work(
@@ -481,7 +478,7 @@ export const showcase = {
       "Website development",
       "amber",
       "image (20).png",
-      "A full-page view of Pampered Paws. The hero stays on the card. The page scrolls in the popup.",
+      "The full Pampered Paws page, from the welcome through grooming services, pricing, the gallery, questions, and the footer.",
       true,
     ),
     work(
@@ -489,7 +486,7 @@ export const showcase = {
       "Website development",
       "pink",
       "image (21).png",
-      "A children's book site. The card shows the opening. Scroll the rest in the popup.",
+      "A children's book site for Pickup Pals. The page holds the story, reviews from young readers, the author, a newsletter, and events.",
       true,
     ),
     work(
@@ -497,14 +494,14 @@ export const showcase = {
       "Website development",
       "amber",
       "image (22).png",
-      "A learning site homepage: courses, certification and a place to start.",
+      "A learning homepage for Tutor Next. Curated courses, certification, and a place to start sit above a section on a more flexible way to learn.",
     ),
     work(
       "MS General Cleaning",
       "Website development",
       "cyan",
       "image (23).png",
-      "A cleaning and maintenance site. The hero stays on the card. The full page scrolls in the popup.",
+      "A cleaning and maintenance site for MS General. Booking, home and office cleaning, property care, and client notes run down one page.",
       true,
     ),
     work(
@@ -512,7 +509,7 @@ export const showcase = {
       "Website development",
       "amber",
       "image (24).png",
-      "A coffee shop page. The card shows the hero. Open it to scroll the products below.",
+      "A coffee shop page, Your Daily Dose of Delight. Drinks sit on the hero, and the best-selling products continue below.",
       true,
     ),
     work(
@@ -520,16 +517,175 @@ export const showcase = {
       "Website development",
       "violet",
       "image (25).png",
-      "A medical treatments homepage, with the offer and the treatment list on one screen.",
+      "A medical treatments homepage for Vale. The offer sits beside a clinician, then four treatments: hair loss, erectile dysfunction, premature ejaculation, and weight loss.",
     ),
     work(
       "Technofy Labs hero",
       "Website development",
       "coral",
       "image (26).png",
-      "The Technofy Labs opening screen, with the services sitting on the headline.",
+      "The Technofy Labs opening. Service cards for web development and logo design sit on the Create Impact headline, with the about block just below.",
     ),
   ] satisfies ShowcaseItem[],
+};
+
+function teamPhoto(file: string) {
+  return `/team/${encodeURIComponent(file)}`;
+}
+
+/** Card pattern behind a portrait. Stays with the person when the list is reordered. */
+export type TeamIcon =
+  | "code"
+  | "design"
+  | "office"
+  | "illustration"
+  | "marketing"
+  | "publish"
+  | "video";
+
+/** The About page. The homepage keeps its own short About section. */
+export const aboutPage = {
+  path: "/about",
+  hero: {
+    label: "About us",
+    heading: ["Meet the ", { accent: "studio" }] satisfies HeadingPart[],
+    link: { label: "Meet the team", href: "#team" },
+  },
+  journey: {
+    id: "journey",
+    label: "Our journey",
+    heading: ["From one brief to ", { accent: "one" }, " team"] satisfies HeadingPart[],
+    intro:
+      "A brand should not have to explain itself five times to get one result. This is the path the studio walks.",
+    chapters: [
+      {
+        n: "01",
+        title: "One table",
+        text: "Strategists, designers, developers, editors and illustrators sit together. The brief is heard once and carried the whole way.",
+      },
+      {
+        n: "02",
+        title: "Karachi, and further out",
+        text: "The studio is based in Karachi and works with brands in the USA, Pakistan and beyond. A US line and a Pakistan line both stay open.",
+      },
+      {
+        n: "03",
+        title: "Six disciplines",
+        text: "Marketing, design, websites, software, video and illustration live under one roof. Hire one of them, or let them work as a set.",
+      },
+      {
+        n: "04",
+        title: "Shipped as one piece",
+        text: "Logos, sites and products leave looking like they came from the same hands, from the first sketch to the last line of code.",
+      },
+    ],
+  },
+  goals: {
+    id: "goals",
+    label: "Our goals",
+    heading: ["What we hold ", { accent: "the work" }, " to"] satisfies HeadingPart[],
+    intro: "Four things we protect on every engagement, before a file is opened and after it ships.",
+    list: [
+      {
+        n: "01",
+        title: "One brief",
+        text: "You explain the goal once. The same team carries it, so nothing has to be retold between vendors.",
+        color: "cyan",
+      },
+      {
+        n: "02",
+        title: "A clear scope",
+        text: "Positioning, deliverables, timeline and budget are agreed before the build starts.",
+        color: "lime",
+      },
+      {
+        n: "03",
+        title: "One look",
+        text: "Identity, interface, motion and words are drawn so they still match when they sit side by side.",
+        color: "coral",
+      },
+      {
+        n: "04",
+        title: "Work that continues",
+        text: "After launch, SEO, ads, content and care can keep running on what already shipped.",
+        color: "violet",
+      },
+    ] satisfies {
+      n: string;
+      title: string;
+      text: string;
+      color: MarkerColor;
+    }[],
+  },
+  team: {
+    id: "team",
+    label: "Our team",
+    heading: ["The people on ", { accent: "the brief" }] satisfies HeadingPart[],
+    intro:
+      "Each person owns a discipline. They work the same job, at the same table.",
+    link: { label: "Start a project", href: "/#contact" },
+    socials: [
+      { label: "Instagram", href: "https://www.instagram.com/invenzee99" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/invenzee" },
+    ],
+    people: [
+      {
+        role: "Safdar Ali Khan",
+        job: "Administrator & Publisher",
+        handle: "product",
+        icon: "publish",
+        image: teamPhoto("Studio Portrait with Branded T-Shirt.png"),
+      },
+      {
+        role: "Aryan-ul-Hassan",
+        job: "Senior Graphic Designer",
+        handle: "design",
+        icon: "design",
+        image: teamPhoto("Studio Portrait of Man Wearing Invenzee T-Shirt.png"),
+      },
+      {
+        role: "Muhammad Ukasha",
+        job: "Full Stack Developer",
+        handle: "studio",
+        icon: "code",
+        image: teamPhoto("Studio Portrait with Invenzee Logo.png"),
+      },
+      {
+        role: "Shehryar Khan",
+        job: "Marketing Strategist",
+        handle: "motion",
+        icon: "marketing",
+        image: teamPhoto("Invenzee T-Shirt Studio Portrait.png"),
+      },
+      {
+        role: "Abdullah Khan",
+        job: "Office Management",
+        handle: "code",
+        icon: "office",
+        image: teamPhoto("Invenzee Studio Portrait.png"),
+      },
+      {
+        role: "Junaid Talib",
+        job: "Illustrator",
+        handle: "marketing",
+        icon: "illustration",
+        image: teamPhoto("Professional Portrait with Invenzee Logo.png"),
+      },
+      {
+        role: "Umer Siddique",
+        job: "Junior Video Editor",
+        handle: "illustration",
+        icon: "video",
+        image: teamPhoto("Studio Portrait with Inventive Logo.png"),
+      },
+    ] satisfies {
+      role: string;
+      job: string;
+      handle: string;
+      icon: TeamIcon;
+      image: string;
+    }[],
+  },
 };
 
 export const process = {

@@ -357,7 +357,13 @@ function WorkVisual({ item, hero = false }: { item: ShowcaseItem; hero?: boolean
       <img
         src={item.image}
         alt=""
-        className={hero && item.long ? `${styles.photo} ${styles.hero}` : styles.photo}
+        className={
+          hero
+            ? item.long
+              ? `${styles.photo} ${styles.hero}`
+              : styles.photo
+            : styles.full
+        }
       />
     );
   }
@@ -446,7 +452,7 @@ function WorkDialog({ item, onClose }: { item: ShowcaseItem; onClose: () => void
                   {block.text}
                 </p>
               ) : (
-                <Button key={index} href={block.href} variant="primary" size="md">
+                <Button key={index} href={block.href} variant="primary" size="md" className={styles.cta}>
                   {block.label}
                 </Button>
               ),

@@ -20,9 +20,14 @@ function Underline() {
   );
 }
 
+/** Hash links are homepage sections. From any other page they need a root path. */
+function rootHref(href: string) {
+  return href.startsWith("#") ? `/${href}` : href;
+}
+
 function TextLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} className={`group inline-block max-w-full ${linkText}`}>
+    <a href={rootHref(href)} className={`group inline-block max-w-full ${linkText}`}>
       {children}
       <Underline />
     </a>
@@ -45,7 +50,7 @@ export function Footer() {
               {services.list.map((item) => (
                 <li key={item.id}>
                   <a
-                    href={`#${services.id}`}
+                    href={`/#${services.id}`}
                     className="group inline-flex max-w-full items-start gap-2.5"
                   >
                     <ServiceIcon

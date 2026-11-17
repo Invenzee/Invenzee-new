@@ -5,7 +5,7 @@ import { nav, navMenus, site, type HeadingPart } from "@/content/site";
 import { ArrowIcon, Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { Flag } from "@/components/ui/Flag";
-import { setScrollLocked } from "@/components/providers/SmoothScroll";
+import { getLenis, setScrollLocked } from "@/components/providers/SmoothScroll";
 import { onReady } from "@/lib/ready";
 import styles from "./Nav.module.css";
 
@@ -114,7 +114,18 @@ export function Nav() {
         data-condensed="false"
         onMouseLeave={() => setMenu(null)}
       >
-        <a href="#main" className={styles.brand} aria-label="Invenzee, home">
+        <a
+          href="/"
+          className={styles.brand}
+          aria-label="Invenzee, home"
+          onClick={(event) => {
+            if (window.location.pathname !== "/") return;
+            event.preventDefault();
+            const lenis = getLenis();
+            if (lenis) lenis.scrollTo("#main");
+            else document.getElementById("main")?.scrollIntoView();
+          }}
+        >
           <Logo variant="full" height={30} priority />
         </a>
 
@@ -140,6 +151,7 @@ export function Nav() {
                     <span className={styles.linkMark} aria-hidden="true" />
                     {link.label}
                   </a>
+                  {active && key ? <MenuPanel name={key} /> : null}
                 </li>
               );
             })}
@@ -148,7 +160,6 @@ export function Nav() {
             {nav.cta.label}
           </Button>
         </nav>
-        {menu ? <MenuPanel name={menu} /> : null}
 
         <div className={styles.mobile}>
           <div className={styles.compactCta}>

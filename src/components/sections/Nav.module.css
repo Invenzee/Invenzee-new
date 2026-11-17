@@ -112,6 +112,10 @@
   list-style: none;
 }
 
+.item {
+  position: relative;
+}
+
 .link {
   position: relative;
   display: inline-flex;
@@ -153,10 +157,12 @@
 .panel {
   position: absolute;
   top: 100%;
-  right: 0;
-  left: 0;
+  left: 50%;
   z-index: 3;
+  width: max-content;
+  max-width: min(760px, calc(100vw - 48px));
   padding-top: 14px;
+  translate: -50% 0;
   transform-origin: top center;
   animation: panelIn 0.5s var(--ease-expo) both;
 }
@@ -172,8 +178,9 @@
 
 .panelCard {
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  grid-template-columns: max-content minmax(220px, 280px);
   gap: 28px;
+  width: max-content;
   padding: 28px 28px 22px;
   border: 1px solid rgb(255 255 255 / 0.14);
   border-radius: var(--radius-control);
@@ -297,9 +304,10 @@
 }
 
 .servicesCard {
-  grid-template-columns: minmax(0, 1fr) minmax(200px, 46%);
+  grid-template-columns: max-content 340px;
   gap: 0;
   align-items: stretch;
+  width: max-content;
   padding: 0;
   overflow: hidden;
 }
@@ -344,6 +352,7 @@
 
 .serviceVisual {
   position: relative;
+  width: 340px;
   min-height: 320px;
   background: var(--color-ink);
 }
@@ -361,6 +370,33 @@
 
 .serviceImage[data-active="true"] {
   transform: scale(1);
+}
+
+/* Scrolled pill: the panel matches the bar, not the word. */
+.shell[data-condensed="true"] .desktop,
+.shell[data-condensed="true"] .item {
+  position: static;
+}
+
+.shell[data-condensed="true"] .panel {
+  right: 0;
+  left: 0;
+  width: auto;
+  max-width: none;
+  translate: none;
+}
+
+.shell[data-condensed="true"] .panelCard,
+.shell[data-condensed="true"] .servicesCard {
+  width: 100%;
+}
+
+.shell[data-condensed="true"] .servicesCard {
+  grid-template-columns: max-content minmax(180px, 1fr);
+}
+
+.shell[data-condensed="true"] .serviceVisual {
+  width: auto;
 }
 
 .mobile {
