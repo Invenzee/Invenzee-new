@@ -388,7 +388,7 @@ function ProfileCard({
           "--pc-pattern-size": iconUrl ? "180% auto" : "100% 100%",
           "--pc-holo-gain": iconUrl ? 1.25 : 0.75,
           "--pc-holo-detail": iconUrl && foil === "dark" ? 1 : 0,
-        } as CSSProperties
+        } as unknown as CSSProperties
       }
     >
       <div className="profile-card__body">
