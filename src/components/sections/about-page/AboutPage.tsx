@@ -1,13 +1,16 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { about, aboutPage, markerHex, site, type TeamIcon } from "@/content/site";
-import { ArrowLink, Button } from "@/components/ui/Button";
+import { useRef } from "react";
+import { about, aboutPage, markerHex, type TeamIcon } from "@/content/site";
+import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
 import InfiniteSpiral from "@/components/ui/InfiniteSpiral/InfiniteSpiral";
 import ProfileCard from "@/components/ui/ProfileCard/ProfileCard";
 import { Reveal } from "@/components/ui/Reveal";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { getLenis } from "@/components/providers/SmoothScroll";
 import styles from "./AboutPage.module.css";
 
 export function AboutPage() {
@@ -30,37 +33,17 @@ function Hero() {
   return (
     <section className={`theme-dark ${styles.hero}`}>
       <div className={styles.heroMain}>
-        <div className={styles.heroTop}>
-          <div className={styles.heroCopy}>
-            <Label>{hero.label}</Label>
-            <Heading parts={hero.heading} as="h1" className="t-h2" />
-            <Reveal delay={80}>
-              <p className={`t-lead text-pretty text-fg ${styles.heroLead}`}>{about.lead}</p>
-            </Reveal>
-            <Reveal delay={140}>
-              <p className={`t-body text-pretty text-fg-2 ${styles.heroBody}`}>{about.body}</p>
-            </Reveal>
-            <Reveal delay={200} className={styles.heroLink}>
-              <ArrowLink href={hero.link.href}>{hero.link.label}</ArrowLink>
-            </Reveal>
-          </div>
-          <p className={`t-label ${styles.places}`}>
-            {site.clocks.map((clock, index) => (
-              <span key={clock.timeZone}>
-                {index > 0 ? <span className={styles.slash}> / </span> : null}
-                {clock.city}
-              </span>
-            ))}
-          </p>
-        </div>
-
-        <div className={styles.stats}>
-          {about.stats.map((stat, index) => (
-            <Reveal key={stat.label} delay={index * 70} className={styles.stat}>
-              <p className={styles.statValue}>{stat.value}</p>
-              <p className="t-label text-fg-3">{stat.label}</p>
-            </Reveal>
-          ))}
+        <div className={styles.heroCopy}>
+          <Label>{hero.label}</Label>
+          <Heading parts={hero.heading} as="h1" className="t-h2" />
+          <Reveal delay={80}>
+            <p className={`t-body text-pretty text-fg-2 ${styles.heroBody}`}>{about.body}</p>
+          </Reveal>
+          <Reveal delay={140} className={styles.heroLink}>
+            <Button href={hero.link.href} variant="primary" size="md">
+              {hero.link.label}
+            </Button>
+          </Reveal>
         </div>
       </div>
       <div className={styles.spiral}>
@@ -68,14 +51,14 @@ function Hero() {
           items={portraits}
           animationMode="all"
           speed={0.55}
-          radius={170}
-          cardWidth={100}
-          cardHeight={100}
-          verticalSpacing={60}
+          radius={220}
+          cardWidth={168}
+          cardHeight={168}
+          verticalSpacing={120}
           perspective={1000}
           cardRadius={10}
           centerScale={1.2}
-          edgeBlur={6}
+          edgeBlur={0}
           cardsPerTurn={7}
           pauseOnHover
         />
@@ -84,29 +67,183 @@ function Hero() {
   );
 }
 
+function offsetWithin(node: HTMLElement, ancestor: HTMLElement) {
+  let x = 0;
+  let y = 0;
+  let current: HTMLElement | null = node;
+  while (current && current !== ancestor) {
+    x += current.offsetLeft;
+    y += current.offsetTop;
+    current = current.offsetParent as HTMLElement | null;
+  }
+  if (current !== ancestor) return null;
+  return { x, y };
+}
+
+function inkBox(title: HTMLElement, stage: HTMLElement) {
+  const nodes = [...title.querySelectorAll<HTMLElement>(".hw, .dot")];
+  if (!nodes.length) return null;
+  let left = Infinity;
+  let right = -Infinity;
+  let top = Infinity;
+  let bottom = -Infinity;
+  for (const node of nodes) {
+    const o = offsetWithin(node, stage);
+    if (!o) return null;
+    left = Math.min(left, o.x);
+    right = Math.max(right, o.x + node.offsetWidth);
+    top = Math.min(top, o.y);
+    bottom = Math.max(bottom, o.y + node.offsetHeight);
+  }
+  if (!Number.isFinite(left) || right <= left) return null;
+  return { left, top, width: right - left, height: bottom - top };
+}
+
+const JOURNEY_ICONS: TeamIcon[] = ["office", "marketing", "design", "code"];
+
 function Journey() {
   const { journey } = aboutPage;
+  const scope = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const track = trackRef.current;
+        const stage = stageRef.current;
+        const head = headRef.current;
+        const viewport = viewportRef.current;
+        const rail = railRef.current;
+        const title = head?.querySelector<HTMLElement>(".t-h2");
+        if (!track || !stage || !head || !viewport || !rail || !title) return;
+
+        let alive = true;
+        const metrics = () => {
+          const vh = window.innerHeight;
+          const titleSpan = vh * 0.9;
+          const hold = vh * 0.08;
+          const reveal = vh * 0.4;
+          const travel = Math.max(0, rail.scrollWidth - viewport.clientWidth + 48);
+          return { titleSpan, hold, reveal, travel, total: titleSpan + hold + reveal + travel };
+        };
+        const phase = (px: number, start: number, span: number) => {
+          if (span <= 0) return px >= start ? 1 : 0;
+          return gsap.utils.clamp(0, 1, (px - start) / span);
+        };
+        const apply = (progress: number) => {
+          const { titleSpan, hold, reveal, travel, total } = metrics();
+          const px = gsap.utils.clamp(0, 1, progress) * total;
+          const titleP = phase(px, 0, titleSpan);
+          const startCqw = 6.4;
+          /* Measure the small title from a known origin, then grow it until it fills the stage. */
+          gsap.set(head, { top: 0, x: 0, y: 0, xPercent: 0, yPercent: 0 });
+          gsap.set(title, { fontSize: `${startCqw}cqw` });
+          const startBox = inkBox(title, stage);
+          const endCqw = startBox
+            ? gsap.utils.clamp(startCqw, 22, (startCqw * stage.clientWidth * 0.94) / startBox.width)
+            : 16;
+          gsap.set(title, { fontSize: `${gsap.utils.interpolate(startCqw, endCqw, titleP)}cqw` });
+          gsap.set(head, { top: 0, x: 0, y: 0, xPercent: 0, yPercent: 0 });
+          const box = inkBox(title, stage);
+          if (box) {
+            const navH =
+              Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 0;
+            const startTop = (stage.clientHeight - box.height) / 2 - box.top;
+            const endTop = navH + 8 - box.top;
+            gsap.set(head, {
+              top: gsap.utils.interpolate(startTop, endTop, titleP),
+              x: (stage.clientWidth - box.width) / 2 - box.left,
+              y: 0,
+              yPercent: 0,
+            });
+          }
+          const revealP = phase(px, titleSpan + hold, reveal);
+          gsap.set(viewport, {
+            autoAlpha: revealP,
+            y: gsap.utils.interpolate(40, 0, revealP),
+            pointerEvents: revealP > 0.85 ? "auto" : "none",
+          });
+          const moved = Math.min(travel, Math.max(0, px - titleSpan - hold - reveal));
+          gsap.set(rail, { x: -moved });
+        };
+        const syncHeight = () => {
+          gsap.set(track, {
+            height: Math.max(stage.offsetHeight, window.innerHeight) + metrics().total,
+          });
+        };
+        syncHeight();
+        ScrollTrigger.addEventListener("refreshInit", syncHeight);
+        const playhead = { p: 0 };
+        const tween = gsap.to(playhead, {
+          p: 1,
+          ease: "none",
+          onUpdate: () => apply(playhead.p),
+          scrollTrigger: {
+            trigger: track,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.6,
+            invalidateOnRefresh: true,
+          },
+        });
+        apply(tween.scrollTrigger?.progress ?? 0);
+        void document.fonts?.ready.then(() => {
+          if (!alive) return;
+          syncHeight();
+          getLenis()?.resize();
+          ScrollTrigger.refresh();
+        });
+        return () => {
+          alive = false;
+          tween.scrollTrigger?.kill();
+          tween.kill();
+          ScrollTrigger.removeEventListener("refreshInit", syncHeight);
+          gsap.set([head, title, viewport, rail], { clearProps: "all" });
+          gsap.set(track, { clearProps: "height" });
+        };
+      });
+    },
+    { scope },
+  );
+
   return (
-    <section id={journey.id} className={`theme-light sheet relative z-10 ${styles.sheet}`}>
-      <div className="wrap sec">
-        <Label>{journey.label}</Label>
-        <div className={styles.sectionHead}>
-          <Heading parts={journey.heading} as="h2" className="t-h2" />
-          <Reveal delay={80}>
-            <p className="t-body text-pretty text-fg-2">{journey.intro}</p>
-          </Reveal>
+    <section id={journey.id} ref={scope} className={`theme-light ${styles.journey}`}>
+      <div ref={trackRef} className={styles.journeyTrack}>
+        <div ref={stageRef} className={styles.journeyStage}>
+          <header ref={headRef} className={styles.journeyHead}>
+            <Heading parts={journey.heading} as="h2" className="t-h2" show />
+          </header>
+          <div ref={viewportRef} className={styles.journeyViewport}>
+            <div ref={railRef} className={styles.journeyRail}>
+              {journey.chapters.map((chapter, index) => (
+                <article key={chapter.n} className={styles.beat}>
+                  <ProfileCard
+                    kicker={chapter.n}
+                    name={chapter.title}
+                    title={chapter.text}
+                    iconUrl={ROLE_PATTERNS[JOURNEY_ICONS[index] ?? "design"]}
+                    backdropColor="#101145"
+                    radius={16}
+                    holo={0.35}
+                    glare={0.4}
+                    tiltStrength={6}
+                    enableTilt
+                    showUserInfo={false}
+                    contactText=""
+                    enableMobileTilt={false}
+                    theme="light"
+                    intro
+                  />
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
-        <ol className={styles.chapters}>
-          {journey.chapters.map((chapter, index) => (
-            <Reveal key={chapter.n} as="li" delay={index * 60} className={styles.chapter}>
-              <p className={styles.chapterNum}>{chapter.n}</p>
-              <div className={styles.chapterCopy}>
-                <h3 className="t-h3">{chapter.title}</h3>
-                <p className="t-body text-pretty text-fg-2">{chapter.text}</p>
-              </div>
-            </Reveal>
-          ))}
-        </ol>
       </div>
     </section>
   );

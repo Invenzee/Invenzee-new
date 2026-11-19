@@ -9,6 +9,8 @@ const smoothstep = (min: number, max: number, value: number) => {
   const x = clamp((value - min) / (max - min || 1), 0, 1);
   return x * x * (3 - 2 * x);
 };
+/** Closest a card is ever scaled. Paint at this size, then scale down, so the photo stays sharp. */
+const DEPTH_MAX = 1.45;
 
 export type SpiralItem = {
   src: string;
@@ -163,8 +165,9 @@ export default function InfiniteSpiral({
         const angleRadians = (angle * Math.PI) / 180;
         const x = Math.sin(angleRadians) * responsiveRadius;
         const z = Math.cos(angleRadians) * responsiveRadius;
-        const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, 1.45);
-        const visualScale = scale * depthScale;
+        const depthScale = clamp(perspective / Math.max(perspective - z, 1), 0.72, DEPTH_MAX);
+        const raster = Math.max(1, centerScale) * DEPTH_MAX;
+        const visualScale = (scale * depthScale) / raster;
         const depth = (z / Math.max(responsiveRadius, 1) + 1) / 2;
         const blur = edgeBlur * smoothstep(0.35, 1, edge);
         card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${offset * verticalSpacing * fit}px, 0) rotateZ(${cardTilt}deg) scale(${visualScale})`;
@@ -204,11 +207,15 @@ export default function InfiniteSpiral({
     pauseOnHover,
   ]);
 
+  const raster = Math.max(1, centerScale) * DEPTH_MAX;
+  const layoutWidth = cardWidth * raster;
+  const layoutHeight = cardHeight * raster;
+
   const rootStyle = {
     perspective: `${perspective}px`,
-    "--infinite-spiral-card-width": `${cardWidth}px`,
-    "--infinite-spiral-card-height": `${cardHeight}px`,
-    "--infinite-spiral-card-radius": `${cardRadius}px`,
+    "--infinite-spiral-card-width": `${layoutWidth}px`,
+    "--infinite-spiral-card-height": `${layoutHeight}px`,
+    "--infinite-spiral-card-radius": `${cardRadius * raster}px`,
     cursor: animationMode === "drag" || animationMode === "all" ? "grab" : "default",
     touchAction: animationMode === "drag" || animationMode === "all" ? "pan-x" : "auto",
     userSelect: animationMode === "drag" || animationMode === "all" ? "none" : "auto",
@@ -265,7 +272,11 @@ export default function InfiniteSpiral({
         {normalizedItems.map((item, index) => {
           const shared = {
             className: "infinite-spiral__item",
-            style: { width: cardWidth, height: cardHeight, borderRadius: cardRadius },
+            style: {
+              width: layoutWidth,
+              height: layoutHeight,
+              borderRadius: cardRadius * raster,
+            },
             role: "listitem" as const,
             "aria-label": item.label ?? item.alt,
           };
@@ -277,8 +288,8 @@ export default function InfiniteSpiral({
               loading={index < 6 ? "eager" : "lazy"}
               draggable={false}
               style={{
-                width: cardWidth,
-                height: cardHeight,
+                width: "100%",
+                height: "100%",
                 maxWidth: "none",
                 maxHeight: "none",
                 objectFit: imageFit,

@@ -25,9 +25,7 @@
   border-radius: var(--infinite-spiral-card-radius);
   background: rgb(255 255 255 / 0.08);
   box-shadow: 0 14px 38px rgb(8 6 18 / 0.2);
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
   text-decoration: none;
 }
 

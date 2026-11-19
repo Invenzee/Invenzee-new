@@ -78,6 +78,8 @@ type ProfileCardProps = {
   socials?: { label: string; href: string }[];
   footerLabel?: string;
   contactText?: string;
+  /** Small label above the name, such as a step number. */
+  kicker?: string;
   showUserInfo?: boolean;
   onContactClick?: () => void;
   theme?: "dark" | "light";
@@ -143,6 +145,7 @@ function ProfileCard({
   socials,
   footerLabel = "",
   contactText = "Contact",
+  kicker = "",
   showUserInfo = true,
   onContactClick,
   theme = "dark",
@@ -405,6 +408,7 @@ function ProfileCard({
             <>
               <span className="profile-card__scrim" />
               <div className="profile-card__info">
+                {kicker ? <p className="profile-card__kicker">{kicker}</p> : null}
                 {name ? <h3 className="profile-card__name">{name}</h3> : null}
                 {title ? <p className="profile-card__title">{title}</p> : null}
               </div>

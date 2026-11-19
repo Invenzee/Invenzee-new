@@ -548,13 +548,13 @@ export const aboutPage = {
   path: "/about",
   hero: {
     label: "About us",
-    heading: ["Meet the ", { accent: "studio" }] satisfies HeadingPart[],
+    heading: ["Meet the ", { accent: "Minds" }] satisfies HeadingPart[],
     link: { label: "Meet the team", href: "#team" },
   },
   journey: {
     id: "journey",
     label: "Our journey",
-    heading: ["From one brief to ", { accent: "one" }, " team"] satisfies HeadingPart[],
+    heading: [{ accent: "Our journey" }] satisfies HeadingPart[],
     intro:
       "A brand should not have to explain itself five times to get one result. This is the path the studio walks.",
     chapters: [
