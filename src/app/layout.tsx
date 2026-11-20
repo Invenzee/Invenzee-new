@@ -1,22 +1,23 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { DM_Mono, DM_Sans, Outfit } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { CursorTrail } from "@/components/ui/CursorTrail";
 import { site } from "@/content/site";
 import "./globals.css";
 
 /* Display — geometric, echoes the logo wordmark */
-const outfit = Outfit({
+const outfit = localFont({
+  src: "../../public/fonts/outfit/Outfit.woff2",
   variable: "--font-outfit",
-  subsets: ["latin"],
+  weight: "100 900",
   display: "swap",
 });
 
 /* Body */
-const dmSans = DM_Sans({
+const dmSans = localFont({
+  src: "../../public/fonts/dm-sans/DM-Sans.woff2",
   variable: "--font-dm-sans",
-  subsets: ["latin"],
+  weight: "100 1000",
   display: "swap",
 });
 
@@ -31,11 +32,14 @@ const remboy = localFont({
 });
 
 /* Labels */
-const dmMono = DM_Mono({
+const dmMono = localFont({
+  src: [
+    { path: "../../public/fonts/dm-mono/DM-Mono-400.woff2", weight: "400", style: "normal" },
+    { path: "../../public/fonts/dm-mono/DM-Mono-500.woff2", weight: "500", style: "normal" },
+  ],
   variable: "--font-dm-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

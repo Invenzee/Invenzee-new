@@ -61,16 +61,6 @@
   background: var(--surface);
 }
 
-/* Marketing uses a campaign canvas with a floating analytics panel. */
-.page[data-service="marketing"] .visual { padding: 0 0 7% 12%; }
-.page[data-service="marketing"] .sample {
-  display: block;
-  position: absolute;
-  inset: auto auto 0 0;
-  width: 43%;
-  aspect-ratio: 4 / 3;
-}
-
 /* Design pairs two plates like an oversize identity spread. */
 .page[data-service="design"] .hero { background-color: var(--color-navy); }
 .page[data-service="design"] .copy { grid-column: 2 / -2; justify-items: center; text-align: center; }

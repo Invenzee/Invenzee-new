@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Contact } from "@/components/sections/Contact";
+import { Faq } from "@/components/sections/Faq";
 import { Footer } from "@/components/sections/Footer";
 import { Nav } from "@/components/sections/Nav";
 import { Process } from "@/components/sections/Process";
+import { Testimonials } from "@/components/sections/Testimonials";
 import { PageReady } from "@/components/sections/about-page/PageReady";
 import { ServicePage } from "@/components/sections/service-page/ServicePage";
+import { MarketingStory } from "@/components/sections/service-page/marketing/MarketingStory";
 import { headingText, services } from "@/content/site";
 import { servicePages } from "@/content/service-pages";
 
@@ -33,6 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ServiceRoute({ params }: Props) {
   const service = await getService(params);
+  const isMarketing = service.id === "marketing";
 
   return (
     <>
@@ -45,8 +50,15 @@ export default async function ServiceRoute({ params }: Props) {
       </a>
       <Nav />
       <main id="main">
-        <ServicePage service={service} />
+        {isMarketing ? <MarketingStory service={service} /> : <ServicePage service={service} />}
         <Process />
+        {isMarketing && (
+          <>
+            <Testimonials />
+            <Faq />
+            <Contact defaultService={headingText(service.title)} />
+          </>
+        )}
       </main>
       <Footer />
     </>

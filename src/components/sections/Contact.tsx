@@ -8,23 +8,31 @@ import { contact, site } from "@/content/site";
 import { ContactForm, ContactPageForm } from "./contact/ContactForm";
 import styles from "./contact/Contact.module.css";
 
-export function Contact({ standalone = false }: { standalone?: boolean }) {
+export function Contact({
+  standalone = false,
+  defaultService,
+}: {
+  standalone?: boolean;
+  defaultService?: string;
+}) {
+  const hasPageHeading = standalone || Boolean(defaultService);
+
   return (
     <section id={contact.id} className={standalone ? `theme-dark ${styles.standalone}` : "theme-dark"} aria-labelledby="contact-heading">
       <div className="wrap sec">
-        {!standalone && <Label>{contact.label}</Label>}
+        {!hasPageHeading && <Label>{contact.label}</Label>}
         <div className={styles.columns}>
           <div className={styles.copy}>
             <div id="contact-heading">
               <Heading
-                parts={standalone ? contact.pageHeading : contact.heading}
+                parts={hasPageHeading ? contact.pageHeading : contact.heading}
                 as={standalone ? "h1" : "h2"}
                 className={`t-h2 ${styles.display}`}
                 dot={!standalone}
               />
             </div>
             <p className={`${styles.intro} mt-7 text-fg-2`}>
-              {standalone ? contact.pageIntro : contact.intro}
+              {hasPageHeading ? contact.pageIntro : contact.intro}
             </p>
             <address className={`${styles.details} not-italic`}>
             <Reveal className={`${styles.detail} border-t border-line py-4`}>
@@ -80,7 +88,7 @@ export function Contact({ standalone = false }: { standalone?: boolean }) {
                 <ContactPageForm />
               </Suspense>
             ) : (
-              <ContactForm />
+              <ContactForm defaultService={defaultService} />
             )}
           </div>
         </div>
