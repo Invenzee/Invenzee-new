@@ -1,26 +1,30 @@
+import { Suspense } from "react";
 import { ArrowIcon } from "@/components/ui/Button";
 import { Flag } from "@/components/ui/Flag";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
 import { Reveal } from "@/components/ui/Reveal";
 import { contact, site } from "@/content/site";
-import { ContactForm } from "./contact/ContactForm";
+import { ContactForm, ContactPageForm } from "./contact/ContactForm";
 import styles from "./contact/Contact.module.css";
 
-export function Contact() {
+export function Contact({ standalone = false }: { standalone?: boolean }) {
   return (
-    <section id={contact.id} className="theme-dark">
+    <section id={contact.id} className={standalone ? `theme-dark ${styles.standalone}` : "theme-dark"} aria-labelledby="contact-heading">
       <div className="wrap sec">
-        <Label>{contact.label}</Label>
+        {!standalone && <Label>{contact.label}</Label>}
         <div className={styles.columns}>
           <div className={styles.copy}>
-            <Heading
-              parts={contact.heading}
-              as="h2"
-              className={`t-h2 ${styles.display}`}
-            />
+            <div id="contact-heading">
+              <Heading
+                parts={standalone ? contact.pageHeading : contact.heading}
+                as={standalone ? "h1" : "h2"}
+                className={`t-h2 ${styles.display}`}
+                dot={!standalone}
+              />
+            </div>
             <p className={`${styles.intro} mt-7 text-fg-2`}>
-              {contact.intro}
+              {standalone ? contact.pageIntro : contact.intro}
             </p>
             <address className={`${styles.details} not-italic`}>
             <Reveal className={`${styles.detail} border-t border-line py-4`}>
@@ -71,7 +75,13 @@ export function Contact() {
             </address>
           </div>
           <div className={styles.formCol}>
-            <ContactForm />
+            {standalone ? (
+              <Suspense fallback={<ContactForm />}>
+                <ContactPageForm />
+              </Suspense>
+            ) : (
+              <ContactForm />
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,226 @@
+.hero {
+  padding-block: calc(var(--nav-h) + clamp(3rem, 7vw, 7rem)) clamp(3rem, 7vw, 7rem);
+  background: radial-gradient(ellipse at 90% 15%, color-mix(in srgb, var(--service-accent) 13%, transparent), transparent 55%), var(--bg);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 4rem) clamp(0.75rem, 1.7vw, 1.75rem);
+  align-items: center;
+}
+
+.copy {
+  grid-column: 1 / 7;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: start;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.copy p { max-width: 33ch; }
+
+.label {
+  color: var(--service-accent);
+  font-size: 0.875rem;
+}
+
+.label :global(.sq) { display: none; }
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 7.5vw, 9rem);
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.065em;
+}
+
+.title :global(.accent) { color: var(--service-accent); }
+
+.visual {
+  position: relative;
+  grid-column: 7 / -1;
+  min-width: 0;
+}
+
+.picture {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.picture img { object-fit: cover; }
+
+.sample {
+  display: none;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+}
+
+/* Marketing uses a campaign canvas with a floating analytics panel. */
+.page[data-service="marketing"] .visual { padding: 0 0 7% 12%; }
+.page[data-service="marketing"] .sample {
+  display: block;
+  position: absolute;
+  inset: auto auto 0 0;
+  width: 43%;
+  aspect-ratio: 4 / 3;
+}
+
+/* Design pairs two plates like an oversize identity spread. */
+.page[data-service="design"] .hero { background-color: var(--color-navy); }
+.page[data-service="design"] .copy { grid-column: 2 / -2; justify-items: center; text-align: center; }
+.page[data-service="design"] .copy p { max-width: 48ch; }
+.page[data-service="design"] .visual {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 0.68fr;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+.page[data-service="design"] .picture { aspect-ratio: 16 / 8; }
+.page[data-service="design"] .sample { display: block; }
+
+/* Web presents a browser-sized canvas with a compact preview. */
+.page[data-service="web"] .copy { grid-column: 1 / -1; }
+.page[data-service="web"] .copy p { max-width: 46ch; }
+.page[data-service="web"] .visual {
+  grid-column: 2 / -2;
+  padding: 1.8rem 0.55rem 0.55rem;
+  border: 1px solid var(--line-2);
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at 14px 13px, var(--service-accent) 2px, transparent 3px),
+    radial-gradient(circle at 25px 13px, var(--line-2) 2px, transparent 3px),
+    radial-gradient(circle at 36px 13px, var(--line-2) 2px, transparent 3px), var(--surface);
+}
+.page[data-service="web"] .picture { aspect-ratio: 2.25; }
+.page[data-service="web"] .sample {
+  display: block;
+  position: absolute;
+  right: -5%;
+  bottom: -5%;
+  width: 25%;
+  aspect-ratio: 4 / 5;
+  border-radius: 0.75rem;
+}
+
+/* Software uses a framed blueprint with a specification alongside it. */
+.page[data-service="software"] .stage { background-image: radial-gradient(var(--line-2) 1px, transparent 1px); background-size: 24px 24px; }
+.page[data-service="software"] .copy {
+  grid-area: 1 / 7 / 2 / -1;
+  padding: clamp(1rem, 3vw, 3rem);
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.page[data-service="software"] .title { font-size: clamp(2.75rem, 5.8vw, 7rem); }
+.page[data-service="software"] .visual { grid-area: 1 / 1 / 2 / 7; padding: 6%; }
+.page[data-service="software"] .picture { aspect-ratio: 1; transform: none; }
+
+/* Video opens as a wide title card and a strip of frames. */
+.page[data-service="video"] .hero { padding-bottom: 1.25rem; }
+.page[data-service="video"] .visual { grid-area: 1 / 1 / 2 / -1; }
+.page[data-service="video"] .picture { aspect-ratio: 2.15; min-height: 32rem; }
+.page[data-service="video"] .picture::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(7 8 28 / 0.96), rgb(7 8 28 / 0.77) 45%, rgb(7 8 28 / 0.17));
+  content: "";
+}
+.page[data-service="video"] .copy { grid-area: 1 / 1 / 2 / 9; padding: clamp(1.5rem, 4vw, 4rem); }
+.page[data-service="video"] .copy p { color: var(--fg); }
+.page[data-service="video"] .sample {
+  display: block;
+  position: absolute;
+  inset: auto 1rem 1rem auto;
+  width: 18%;
+  aspect-ratio: 16 / 9;
+}
+
+/* Illustration uses an arched print with an inset artwork swatch. */
+.page[data-service="illustration"] .hero { background-color: #28132c; }
+.page[data-service="illustration"] .copy { grid-column: 1 / 8; }
+.page[data-service="illustration"] .visual { grid-column: 8 / -1; margin: 0 8% 5% 0; }
+.page[data-service="illustration"] .picture { border-radius: 50% 50% 6px 6px / 44% 44% 6px 6px; aspect-ratio: 0.82; }
+.page[data-service="illustration"] .sample {
+  display: block;
+  position: absolute;
+  bottom: -5%;
+  right: -8%;
+  width: 41%;
+  border: 3px solid var(--service-accent);
+  border-radius: 50%;
+  aspect-ratio: 1;
+}
+
+.scopeInner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  align-items: start;
+}
+
+.scope h2 { max-width: 14ch; }
+.deliverables { display: grid; gap: 0; }
+.deliverables li { border-top: 1px solid var(--line); padding-block: 1.2rem; }
+.deliverables p { color: var(--fg-2); margin-top: 0.6rem; max-width: 50ch; }
+
+.page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .scopeInner { grid-template-columns: 1fr; }
+.page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .scope h2 { max-width: 19ch; }
+.page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .deliverables { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1rem; }
+.page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .deliverables li {
+  grid-column: span 2;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: clamp(1rem, 2.5vw, 2rem);
+}
+.page[data-service="design"] .deliverables li:nth-child(-n+2) { grid-column: span 3; border-top: 3px solid var(--service-accent); }
+.page[data-service="illustration"] .deliverables li:first-child { grid-column: span 4; background: color-mix(in srgb, var(--service-accent) 28%, var(--surface)); }
+.page[data-service="video"] .deliverables li { border-top-color: var(--service-accent); }
+.page[data-service="web"] .deliverables li { display: grid; grid-template-columns: 1fr 1.5fr; gap: 1rem; }
+.page[data-service="web"] .deliverables p { margin: 0; }
+.page[data-service="software"] .deliverables li { padding-inline: 1.2rem; border-left: 2px solid var(--service-accent); }
+.page[data-service="software"] .scope { border-top: 1px solid var(--line); }
+
+.related { border-block: 1px solid var(--line); }
+.relatedInner { padding-block: clamp(2rem, 4vw, 4rem); }
+.relatedInner ul { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: 1.2rem; }
+.relatedInner a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+}
+.relatedInner a:is(:hover, :focus-visible) { border-color: var(--service-accent); color: var(--service-accent); }
+
+@media (max-width: 800px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+
+  .page[data-service] :is(.copy, .visual) {
+    grid-area: auto;
+  }
+
+  .page[data-service="video"] :is(.copy, .visual) { grid-area: 1 / 1; }
+  .page[data-service="video"] .picture { min-height: 30rem; }
+  .page[data-service="video"] .sample { display: none; }
+  .page[data-service="software"] .visual { padding: 0; }
+  .page[data-service="web"] .visual { margin-inline: 0 5%; }
+  .page[data-service="illustration"] .visual { width: min(76%, 26rem); justify-self: center; }
+  .scopeInner { grid-template-columns: minmax(0, 1fr); }
+
+  .page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .deliverables {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  }
+  .page:is([data-service="design"], [data-service="illustration"], [data-service="video"]) .deliverables li:nth-child(n) { grid-column: auto; }
+}
+
+@media (max-width: 450px) {
+  .page[data-service="web"] .deliverables li { grid-template-columns: 1fr; gap: 0.5rem; }
+  .page[data-service="video"] .title { font-size: clamp(2.5rem, 11vw, 3.25rem); }
+}

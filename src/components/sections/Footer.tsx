@@ -3,7 +3,7 @@ import { CurrentYear, LiveClock } from "@/components/ui/LiveClock";
 import { Flag } from "@/components/ui/Flag";
 import { Logo } from "@/components/ui/Logo";
 import { ServiceIcon } from "@/components/ui/ServiceIcon";
-import { contact, faq, footer, headingText, markerHex, nav, services, site } from "@/content/site";
+import { faq, footer, headingText, markerHex, nav, services, site } from "@/content/site";
 import { BackToTop } from "./footer/BackToTop";
 import { Wordmark } from "./footer/Wordmark";
 
@@ -50,7 +50,7 @@ export function Footer() {
               {services.list.map((item) => (
                 <li key={item.id}>
                   <a
-                    href={`/#${services.id}`}
+                    href={`/services/${item.id}`}
                     className="group inline-flex max-w-full items-start gap-2.5"
                   >
                     <ServiceIcon
@@ -81,7 +81,7 @@ export function Footer() {
                 <TextLink href={`#${faq.id}`}>FAQ</TextLink>
               </li>
               <li>
-                <TextLink href={`#${contact.id}`}>Contact</TextLink>
+                <TextLink href={nav.cta.href}>Contact</TextLink>
               </li>
             </ul>
           </div>

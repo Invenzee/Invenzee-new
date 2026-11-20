@@ -61,7 +61,7 @@ function ServiceCopy({ index }: { index: number }) {
           </li>
         ))}
       </ul>
-      <Button href="#contact" variant="primary" size="md" className="mt-7">
+      <Button href={`/services/${service.id}`} variant="primary" size="md" className="mt-7">
         {service.cta}
       </Button>
     </div>

@@ -76,3 +76,20 @@
     white-space: nowrap;
   }
 }
+.standalone {
+  padding-top: var(--nav-h);
+  background: radial-gradient(ellipse at 82% 0%, rgb(75 197 222 / 0.16), transparent 54%), var(--bg);
+}
+
+.standalone .intro {
+  max-width: 35ch;
+  white-space: normal;
+}
+
+.standalone .display {
+  font-size: clamp(3.5rem, 9vw, 9rem) !important;
+}
+
+.standalone .columns {
+  align-items: start;
+}

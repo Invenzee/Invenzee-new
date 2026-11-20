@@ -68,7 +68,7 @@ export const nav = {
     { label: "Process", href: "/#process" },
     { label: "About", href: "/about", menu: "about" },
   ],
-  cta: { label: "Start a project", href: "/#contact" },
+  cta: { label: "Start a project", href: "/contact" },
 } as const;
 
 export const hero = {
@@ -260,7 +260,7 @@ export const navMenus = {
     title: ["Pick one. ", { accent: "Or all six." }] satisfies HeadingPart[],
     cta: { label: "All services", href: "/#services" },
     items: services.list.map((service) => ({
-      href: "/#services",
+      href: `/services/${service.id}`,
       title: headingText(service.title),
       image: service.image,
     })),
@@ -280,7 +280,7 @@ export const navMenus = {
         text: "From brief to launch in six moves",
       },
       {
-        href: "/#contact",
+        href: nav.cta.href,
         title: "Get in touch",
         text: "Address, mailbox and phone",
       },
@@ -623,7 +623,7 @@ export const aboutPage = {
     heading: ["The people on ", { accent: "the brief" }] satisfies HeadingPart[],
     intro:
       "Each person owns a discipline. They work the same job, at the same table.",
-    link: { label: "Start a project", href: "/#contact" },
+    link: nav.cta,
     socials: [
       { label: "Instagram", href: "https://www.instagram.com/invenzee99" },
       { label: "LinkedIn", href: "https://www.linkedin.com/company/invenzee" },
@@ -861,6 +861,8 @@ export const contact = {
     " it",
   ] satisfies HeadingPart[],
   intro: "Tell us what you are building. We will get back to you with next steps.",
+  pageHeading: ["Contact ", { accent: "us" }] satisfies HeadingPart[],
+  pageIntro: "Tell us about your project, what you’d like to achieve, and when you’d like to get started.",
   form: {
     name: "Your name",
     email: "Your email",

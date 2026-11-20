@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowIcon } from "@/components/ui/Button";
 import { contact, headingText, services, site } from "@/content/site";
 import styles from "./ContactForm.module.css";
@@ -43,7 +44,14 @@ function Chevron() {
   );
 }
 
-export function ContactForm() {
+export function ContactPageForm() {
+  const serviceId = useSearchParams().get("service");
+  const service = services.list.find(({ id }) => id === serviceId);
+
+  return <ContactForm key={serviceId} defaultService={service && headingText(service.title)} />;
+}
+
+export function ContactForm({ defaultService = contact.form.serviceFallback }: { defaultService?: string }) {
   const [opened, setOpened] = useState(false);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -91,7 +99,7 @@ export function ContactForm() {
         <select
           id="contact-service"
           name="service"
-          defaultValue={contact.form.serviceFallback}
+          defaultValue={defaultService}
           className={`${styles.control} ${styles.select}`}
         >
           <option value={contact.form.serviceFallback}>
