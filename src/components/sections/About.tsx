@@ -156,15 +156,11 @@ export function About() {
               <li key={person.handle} className={`${styles.tile} relative overflow-hidden rounded-card bg-surface`}>
                 <Image
                   src={person.image.replace("/team/", "/team/homepage/").replace(/\.png$/, ".webp")}
-                  alt=""
+                  alt={person.role}
                   fill
                   sizes="(max-width: 916px) 185px, (max-width: 1666px) 20vw, 336px"
                   className={styles.portrait}
                 />
-                <div className={styles.caption}>
-                  <p className="t-h4">{person.role}</p>
-                  <p className="t-small">{person.job}</p>
-                </div>
               </li>
             ))}
           </ul>
