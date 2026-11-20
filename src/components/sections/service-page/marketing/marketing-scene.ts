@@ -110,7 +110,7 @@ export async function mountMarketingScene(
   host: HTMLElement,
   signal: AbortSignal,
   connectScroll: (update: (progress: number) => void) => () => void,
-  updateCopy: (socialOpacity: number, seoOpacity: number) => void,
+  updateCopy: (socialOpacity: number, seoOpacity: number, chapter: number) => void,
 ) {
   const renderer = new WebGLRenderer({ alpha: true, antialias: true, powerPreference: "low-power" });
   renderer.setClearColor(new Color("#07081c"), 0);
@@ -159,8 +159,9 @@ export async function mountMarketingScene(
     renderer.domElement.setAttribute("aria-hidden", "true");
     host.appendChild(renderer.domElement);
     let width = 0;
-    let height = 7;
+    const height = 7;
     let compact = false;
+    let landscape = false;
     let target = 0;
     let progress = 0;
     let onscreen = true;
@@ -174,6 +175,7 @@ export async function mountMarketingScene(
     let badgeOpacity = 1;
     let copyOpacity = 1;
     let seoOpacity = 0;
+    let activeChapter = 0;
     let rendered = false;
     let lastTime = performance.now();
 
@@ -181,8 +183,8 @@ export async function mountMarketingScene(
       const w = host.clientWidth;
       const h = host.clientHeight;
       if (!w || !h) return;
-      compact = w <= 760;
-      height = compact ? 4.5 : 7;
+      compact = window.matchMedia("(max-width: 760px), (max-width: 1000px) and (max-height: 500px)").matches;
+      landscape = compact && w > h;
       width = height * w / h;
       camera.left = -width / 2;
       camera.right = width / 2;
@@ -193,7 +195,7 @@ export async function mountMarketingScene(
       renderer.setSize(w, h, false);
     };
 
-    const position = (side: number) => compact ? 0 : width * 0.244 * side;
+    const position = (side: number) => landscape ? -width * 0.25 : compact ? 0 : width * 0.244 * side;
     const draw = (now: number) => {
       if (!onscreen || !width) return;
       const dt = Math.min((now - lastTime) / 1000, 0.05);
@@ -209,27 +211,36 @@ export async function mountMarketingScene(
       }
 
       const t = now / 1000;
-      const sceneScale = compact ? Math.min(0.94, width / 4.4) : Math.min(1, width / 10.9);
+      const sceneScale = compact ? Math.min(0.94, width / (landscape ? 9.8 : 4.4)) : Math.min(1, width / 10.9);
       const reveal = blend(progress, 0.01, 0.86);
       const socialFade = blend(progress, 1.02, 1.20);
       const phoneZoom = blend(progress, 1.20, 1.65);
       const phoneFade = blend(progress, 1.65, 1.81);
       const swap = blend(progress, 1.81, 2.00);
-      if (copyOpacity !== 1 - socialFade || seoOpacity !== swap) {
+      const feedProgress = Math.round(blend(progress, 0.27, 1.08) * 28);
+      const postProgress = feedProgress / 28;
+      const postMix = blend(postProgress, 0.23, 0.52);
+      const isEmail = progress >= 3.52;
+      const isPaid = progress > 2.52;
+      const chapter = isEmail ? 4 : isPaid ? 3 : swap > 0 ? 2 : socialFade === 1 ? -1 : postMix >= 0.5 ? 1 : 0;
+      if (copyOpacity !== 1 - socialFade || seoOpacity !== swap || activeChapter !== chapter) {
         copyOpacity = 1 - socialFade;
         seoOpacity = swap;
-        updateCopy(copyOpacity, seoOpacity);
+        activeChapter = chapter;
+        updateCopy(copyOpacity, seoOpacity, activeChapter);
       }
       const shift = blend(progress, 2.16, 2.92);
       const emailShift = blend(progress, 3.15, 3.92);
       const floating = Math.sin(t * 1.8) * 0.11;
       const right = position(1);
       const left = position(-1);
-      const heroScale = Math.min(height * 1.11 / phoneHeight, width * (compact ? 0.42 : 0.29) / phoneWidth);
-      // Set the projected bottom 30% of the front-facing phone below the stage.
-      const heroY = -height / 2 - (phone.bounds.min.y + phoneHeight * 0.30) * heroScale;
+      const visualY = landscape ? -height * 0.06 : compact ? height * 0.165 : 0;
+      const heroMaxWidth = landscape ? 0.23 : compact ? 0.36 : 0.29;
+      const heroScale = Math.min(height * (compact ? 0.38 : 1.11) / phoneHeight, width * heroMaxWidth / phoneWidth);
+      // Crop the desktop phone at the bottom. On mobile the entire phone sits above the copy.
+      const heroY = compact ? visualY : -height / 2 - (phone.bounds.min.y + phoneHeight * 0.30) * heroScale;
       const phoneX = mix(mix(right, left, reveal), 0, phoneZoom);
-      const phoneY = mix(mix(heroY, 0.13 + floating, reveal), 0, phoneZoom);
+      const phoneY = mix(mix(heroY, visualY + 0.13 + floating, reveal), 0, phoneZoom);
       const phoneScale = mix(mix(heroScale, sceneScale, reveal), width / phoneWidth, phoneZoom);
       const phoneTurn = reveal * 2 * pi;
       const phoneTilt = 1 - phoneZoom;
@@ -239,22 +250,21 @@ export async function mountMarketingScene(
       phone.root.rotation.set(pitch * phoneTilt, yaw * phoneTilt + phoneTurn, -yaw * 0.22 * phoneTilt);
       phone.root.scale.setScalar(phoneScale);
       for (const material of phone.surfaces) material.opacity = 1 - phoneFade;
-      const feedProgress = Math.round(blend(progress, 0.27, 1.08) * 28);
       if (phone.root.visible && previousFeed !== feedProgress) {
-        const postProgress = feedProgress / 28;
         drawScreenshot(phone.feed.ctx, heroPost.value, true, postProgress, {
           image: socialPost.value,
-          opacity: blend(postProgress, 0.23, 0.52),
+          opacity: postMix,
         });
         phone.feed.texture.needsUpdate = true;
         previousFeed = feedProgress;
       }
 
       laptop.root.visible = swap > 0.004;
-      laptop.root.position.set(mix(mix(right, left, shift), right, emailShift), -0.06 + floating * 0.50, 0);
-      laptop.root.scale.setScalar(sceneScale * Math.max(0.001, swap * mix(1, 0.87, emailShift)));
+      laptop.root.position.set(mix(mix(right, left, shift), right, emailShift), visualY - 0.06 + floating * 0.50, 0);
+      const laptopScale = compact ? Math.min(sceneScale, width / 5.25) : sceneScale;
+      laptop.root.scale.setScalar(laptopScale * Math.max(0.001, swap * mix(1, 0.87, emailShift)));
       laptop.root.rotation.set(pitch + mix(0.10, 0.20, shift), yaw + mix(mix(-0.26, 0.26, shift), -0.15, emailShift), (1 - swap) * 0.45 - shift * 0.04 - yaw * 0.12);
-      const laptopImage = progress >= 3.52 ? gmail.value : progress > 2.52 ? meta.value : searchConsole.value;
+      const laptopImage = isEmail ? gmail.value : isPaid ? meta.value : searchConsole.value;
       if (laptop.root.visible && laptopImage !== previousLaptopImage) {
         drawScreenshot(laptop.view.ctx, laptopImage);
         laptop.view.texture.needsUpdate = true;
@@ -264,7 +274,7 @@ export async function mountMarketingScene(
       const social = blend(progress, 0.54, 0.91) * (1 - socialFade);
       engagementChip.visible = social > 0.005;
       engagementChip.material.opacity = social;
-      engagementChip.position.set(phoneX + 1.15 * sceneScale, (1.65 + 0.11 * Math.sin(t * 2)) * sceneScale, 3);
+      engagementChip.position.set(phoneX + 1.15 * sceneScale, visualY + (1.65 + 0.11 * Math.sin(t * 2)) * sceneScale, 3);
       engagementChip.scale.set(1.66 * sceneScale, 0.37 * sceneScale, 1);
       if (social > 0.005 && feedProgress !== previousEngagement) {
         const count = Math.round(148 + feedProgress / 28 * 1136).toLocaleString("en-US");

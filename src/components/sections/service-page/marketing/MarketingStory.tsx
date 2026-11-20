@@ -35,7 +35,7 @@ const chapters: { id: string; label: string; heading: HeadingPart[]; detail: str
   },
   {
     id: "paid-ads",
-    label: "Paid search and social",
+    label: "Paid ads · Search and social",
     heading: ["Make your ", { accent: "ad spend" }, " count."],
     detail: "Give each campaign a clear goal. We test creative and landing pages, track conversions, and put more budget behind what works.",
     art: "web",
@@ -49,14 +49,39 @@ const chapters: { id: string; label: string; heading: HeadingPart[]; detail: str
   },
 ];
 
+function ChapterCopy({ index, service }: { index: number; service: Service }) {
+  const chapter = chapters[index];
+
+  return (
+    <div className={styles.copy}>
+      <Label color={markerHex.lime}>{index === 0 ? headingText(service.title) : chapter.label}</Label>
+      <Heading
+        as={index === 0 ? "h1" : "h2"}
+        className={index === 0 ? styles.title : `t-h2 ${styles.heading}`}
+        parts={chapter.heading}
+        dot={false}
+        show
+      />
+      <p className="t-lead text-fg-2">{index === 0 ? service.summary : chapter.detail}</p>
+      {index === 0 || index === chapters.length - 1 ? (
+        <Button href={`#${contact.id}`}>{service.cta}</Button>
+      ) : null}
+    </div>
+  );
+}
+
 export function MarketingStory({ service }: { service: Service }) {
   const story = useRef<HTMLDivElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
+  const mobileContent = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = story.current;
     const host = viewport.current;
-    if (!root || !host) return;
+    const mobile = mobileContent.current;
+    if (!root || !host || !mobile) return;
+    const mobilePanels = Array.from(mobile.children) as HTMLElement[];
+    let activePanel = 0;
 
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
@@ -108,9 +133,14 @@ export function MarketingStory({ service }: { service: Service }) {
             entrances.revert();
             trigger.kill();
           };
-        }, (socialOpacity, seoOpacity) => {
+        }, (socialOpacity, seoOpacity, chapter) => {
           root.style.setProperty("--social-copy-opacity", String(socialOpacity));
           root.style.setProperty("--seo-copy-opacity", String(seoOpacity));
+          if (chapter !== activePanel) {
+            if (mobilePanels[activePanel]) mobilePanels[activePanel].hidden = true;
+            if (mobilePanels[chapter]) mobilePanels[chapter].hidden = false;
+            activePanel = chapter;
+          }
         });
       }).catch(() => {
         if (!controller.signal.aborted) root.dataset.motion = "fallback";
@@ -122,6 +152,9 @@ export function MarketingStory({ service }: { service: Service }) {
         root.dataset.motion = "loading";
         root.style.removeProperty("--social-copy-opacity");
         root.style.removeProperty("--seo-copy-opacity");
+        if (mobilePanels[activePanel]) mobilePanels[activePanel].hidden = true;
+        mobilePanels[0].hidden = false;
+        activePanel = 0;
       };
     });
 
@@ -130,15 +163,15 @@ export function MarketingStory({ service }: { service: Service }) {
 
   return (
     <div className={`theme-dark ${styles.story}`} ref={story} data-motion="loading">
-      <div className={styles.stage} aria-hidden="true">
-        <div className={styles.viewport} ref={viewport} />
-        <div className={styles.heroVisual}>
+      <div className={styles.stage}>
+        <div className={styles.viewport} ref={viewport} aria-hidden="true" />
+        <div className={styles.heroVisual} aria-hidden="true">
           <div className={styles.poster}>
             <Image
               src="/models/marketing/instagram-office-camera.jpg"
               fill
               alt=""
-              sizes="(max-width: 760px) 42vw, 29vw"
+              sizes="(max-width: 760px) 36vw, 29vw"
               preload
             />
           </div>
@@ -146,31 +179,25 @@ export function MarketingStory({ service }: { service: Service }) {
           <span className={styles.badge}>◇ 84 comments</span>
           <span className={styles.badge}>+ 60 followers</span>
         </div>
+        <div className={styles.mobileContent} ref={mobileContent}>
+          {chapters.map(({ id }, index) => (
+            <div key={id} hidden={index !== 0} data-chapter={id}>
+              <ChapterCopy index={index} service={service} />
+            </div>
+          ))}
+        </div>
       </div>
       <div className={styles.chapters}>
-      {chapters.map((chapter, index) => (
-        <section id={chapter.id} key={chapter.id} className={styles.chapter} data-side={index % 2 ? "right" : "left"}>
-          <div className={`wrap ${styles.row}`}>
-            <div className={styles.copy}>
-              <Label color={markerHex.lime}>{index === 0 ? headingText(service.title) : chapter.label}</Label>
-              <Heading
-                as={index === 0 ? "h1" : "h2"}
-                className={index === 0 ? styles.title : `t-h2 ${styles.heading}`}
-                parts={chapter.heading}
-                dot={false}
-                show
-              />
-              <p className="t-lead text-fg-2">{index === 0 ? service.summary : chapter.detail}</p>
-              {index === 0 || index === chapters.length - 1 ? (
-                <Button href={`#${contact.id}`}>{service.cta}</Button>
-              ) : null}
+        {chapters.map((chapter, index) => (
+          <section id={chapter.id} key={chapter.id} className={styles.chapter} data-side={index % 2 ? "right" : "left"}>
+            <div className={`wrap ${styles.row}`}>
+              <ChapterCopy index={index} service={service} />
+              <div className={styles.fallback} aria-hidden="true">
+                <Artwork variant={chapter.art} tone={index % 2 ? "navy" : "ink"} animated={false} />
+              </div>
             </div>
-            <div className={styles.fallback} aria-hidden="true">
-              <Artwork variant={chapter.art} tone={index % 2 ? "navy" : "ink"} animated={false} />
-            </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        ))}
       </div>
     </div>
   );
