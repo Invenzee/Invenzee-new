@@ -9,6 +9,7 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { PageReady } from "@/components/sections/about-page/PageReady";
 import { ServicePage } from "@/components/sections/service-page/ServicePage";
 import { DesignStory } from "@/components/sections/service-page/design/DesignStory";
+import { WebsiteStory } from "@/components/sections/service-page/web/WebsiteStory";
 import { MarketingStory } from "@/components/sections/service-page/marketing/MarketingStory";
 import { headingText, services } from "@/content/site";
 import { servicePages } from "@/content/service-pages";
@@ -39,7 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ServiceRoute({ params }: Props) {
   const service = await getService(params);
   const story = service.id === "marketing" ? <MarketingStory service={service} />
-    : service.id === "design" ? <DesignStory service={service} /> : null;
+    : service.id === "design" ? <DesignStory service={service} />
+    : service.id === "web" ? <WebsiteStory service={service} /> : null;
 
   return (
     <>

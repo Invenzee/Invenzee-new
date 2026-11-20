@@ -1,8 +1,8 @@
-import type { ComponentType } from "react";
+import { ServiceStory, type StoryChapter } from "../ServiceStory";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/Label";
-import { contact, markerHex, type Service } from "@/content/site";
+
+
+import type { Service } from "@/content/site";
 import { CampaignImage, IdentityProof, InkProof, Wordmark } from "./MotionPrint";
 import styles from "./DesignStory.module.css";
 
@@ -25,7 +25,7 @@ function CampaignFormats() {
     </div>
   );
 }
-const chapters: { id: string; label: string; heading: [string, string]; detail: string; Art: ComponentType }[] = [
+const chapters: StoryChapter[] = [
   {
     id: "typography", label: "Graphic design · Typography",
     Art: IdentityProof,
@@ -52,34 +52,6 @@ const chapters: { id: string; label: string; heading: [string, string]; detail: 
   },
 ];
 
-function ChapterHeading({ lines, hero }: { lines: [string, string]; hero: boolean }) {
-  const Tag = hero ? "h1" : "h2";
-  return (
-    <Tag className={hero ? styles.title : styles.heading}>
-      {lines[0]}<br /><span>{lines[1]}</span>
-    </Tag>
-  );
-}
-
 export function DesignStory({ service }: { service: Service }) {
-  return (
-    <div className={`theme-dark ${styles.story}`}>
-      {chapters.map(({ id, label, heading, detail, Art }, index) => (
-        <section key={id} id={id} className={styles.chapter} aria-label={label}>
-          <div className={`wrap ${styles.stage}`}>
-            <div className={styles.copy}>
-              <Label color={markerHex[service.color]}>{label}</Label>
-              <ChapterHeading lines={heading} hero={index === 0} />
-              <p className="t-lead text-fg-2">{detail}</p>
-              {(index === 0 || index === chapters.length - 1) && <Button href={`#${contact.id}`}>{service.cta}</Button>}
-            </div>
-            <div className={styles.art} aria-hidden="true">
-              <Art />
-            </div>
-          </div>
-        </section>
-      ))}
-    </div>
-  );
+  return <ServiceStory service={service} chapters={chapters} />;
 }
-
