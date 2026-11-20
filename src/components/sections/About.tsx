@@ -1,18 +1,14 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { useRef } from "react";
-import { about } from "@/content/site";
+import Image from "next/image";
+import { about, aboutPage } from "@/content/site";
 import { Button } from "@/components/ui/Button";
-import { Artwork } from "@/components/ui/Artwork";
 import { Heading } from "@/components/ui/Heading";
 import { Label } from "@/components/ui/Label";
 import { Reveal } from "@/components/ui/Reveal";
 import { EASE_EXPO, gsap, prefersReducedMotion, useGSAP } from "@/lib/gsap";
 import styles from "./About.module.css";
-
-/** Width / height for the six frames, in source order. */
-const STRIP_WIDTH = ["1.333333", "0.75", "1", "1.333333", "0.75", "1"];
 
 function isPureNumber(value: string) {
   return /^\d+$/.test(value);
@@ -21,7 +17,7 @@ function isPureNumber(value: string) {
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const rowRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLUListElement>(null);
 
   useGSAP(
     () => {
@@ -151,20 +147,27 @@ export function About() {
         <div
           ref={scrollerRef}
           className={`${styles.scroller} mt-[clamp(56px,7vw,112px)]`}
-          aria-hidden="true"
+          role="region"
+          aria-label="Invenzee team"
           data-lenis-prevent-touch=""
         >
-          <div ref={rowRef} className={styles.row}>
-            {about.strip.map((item, i) => (
-              <div
-                key={`${item.art}-${item.tone}`}
-                className={`${styles.tile} relative overflow-hidden rounded-card bg-surface`}
-                style={{ "--tile-w": STRIP_WIDTH[i] ?? "1" } as CSSProperties}
-              >
-                <Artwork variant={item.art} tone={item.tone} className="absolute inset-0" />
-              </div>
+          <ul ref={rowRef} className={styles.row}>
+            {aboutPage.team.people.map((person) => (
+              <li key={person.handle} className={`${styles.tile} relative overflow-hidden rounded-card bg-surface`}>
+                <Image
+                  src={person.image.replace("/team/", "/team/homepage/").replace(/\.png$/, ".webp")}
+                  alt=""
+                  fill
+                  sizes="(max-width: 916px) 185px, (max-width: 1666px) 20vw, 336px"
+                  className={styles.portrait}
+                />
+                <div className={styles.caption}>
+                  <p className="t-h4">{person.role}</p>
+                  <p className="t-small">{person.job}</p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>

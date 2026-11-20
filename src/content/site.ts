@@ -115,15 +115,6 @@ export const about = {
     { value: "360°", label: "From strategy to launch" },
     { value: "1", label: "Team, one brief" },
   ],
-  /* Artwork strip that drifts sideways under the stats */
-  strip: [
-    { art: "brand", tone: "navy" },
-    { art: "illustration", tone: "cyan" },
-    { art: "web", tone: "ink" },
-    { art: "growth", tone: "paper" },
-    { art: "motion", tone: "navy" },
-    { art: "app", tone: "cyan" },
-  ] satisfies { art: ArtVariant; tone: ArtTone }[],
 };
 
 export type Service = {
