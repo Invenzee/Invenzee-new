@@ -11,6 +11,7 @@ export type StoryChapter = {
   detail: string;
   Art: ComponentType;
   interactive?: boolean;
+  artLabel?: string;
 };
 
 function ChapterHeading({ lines, hero }: { lines: [string, string]; hero: boolean }) {
@@ -25,7 +26,7 @@ function ChapterHeading({ lines, hero }: { lines: [string, string]; hero: boolea
 export function ServiceStory({ service, chapters }: { service: Service; chapters: StoryChapter[] }) {
   return (
     <div className={`theme-dark ${styles.story}`}>
-      {chapters.map(({ id, label, heading, detail, Art, interactive }, index) => (
+      {chapters.map(({ id, label, heading, detail, Art, interactive, artLabel }, index) => (
         <section key={id} id={id} className={styles.chapter} aria-label={heading.join(" ")}>
           <div className={`wrap ${styles.stage}`}>
             <div className={styles.copy}>
@@ -34,7 +35,7 @@ export function ServiceStory({ service, chapters }: { service: Service; chapters
               <p className="t-lead text-fg-2">{detail}</p>
               {(index === 0 || index === chapters.length - 1) && <Button href={`#${contact.id}`}>{service.cta}</Button>}
             </div>
-            <div className={styles.art} aria-hidden={interactive ? undefined : true}>
+            <div className={styles.art} role={artLabel ? "img" : undefined} aria-label={artLabel} aria-hidden={interactive || artLabel ? undefined : true}>
               <Art />
             </div>
           </div>

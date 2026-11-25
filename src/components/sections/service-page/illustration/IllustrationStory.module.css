@@ -1,0 +1,36 @@
+.print {
+  position: absolute;
+  inset: 4% 2%;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-ink);
+}
+.print img { object-fit: contain; }
+.print[data-plate="courier"] { inset: 7% 4%; }
+.print[data-plate="departure"]::after {
+  content: "";
+  position: absolute;
+  inset: 0 50% 50% 0;
+  border: max(2px, .4cqw) solid var(--color-pink);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .print[data-plate="whale"] img { animation: drift 12s ease-in-out infinite alternate; }
+  .print[data-plate="courier"] { animation: leaf 7s var(--ease-io) infinite alternate; }
+  .print[data-plate="signals"] img { animation: proof 9s ease-in-out infinite; }
+  .print[data-plate="departure"]::after { animation: readFrames 10s steps(1,end) infinite; }
+  .print[data-plate="tides"] img { animation: approach 11s ease-in-out infinite alternate; transform-origin: 50% 60%; }
+}
+@keyframes drift { from { transform: scale(1.035) translateX(-1%); } to { transform: scale(1.035) translateX(1%); } }
+@keyframes leaf { from { transform: rotate(-1.5deg); } to { transform: rotate(1deg) translateY(-1%); } }
+@keyframes proof { 0%, 100% { filter: saturate(.65); } 38%, 78% { filter: saturate(1.15); } }
+@keyframes readFrames {
+  0% { opacity: 0; }
+  12% { opacity: 1; transform: none; }
+  32% { opacity: 1; transform: translateX(100%); }
+  52% { opacity: 1; transform: translateY(100%); }
+  72% { opacity: 1; transform: translate(100%,100%); }
+  92%,100% { opacity: 0; }
+}
+@keyframes approach { to { transform: scale(1.045); } }

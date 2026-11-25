@@ -10,6 +10,9 @@ import { PageReady } from "@/components/sections/about-page/PageReady";
 import { ServicePage } from "@/components/sections/service-page/ServicePage";
 import { DesignStory } from "@/components/sections/service-page/design/DesignStory";
 import { WebsiteStory } from "@/components/sections/service-page/web/WebsiteStory";
+import { SoftwareStory } from "@/components/sections/service-page/software/SoftwareStory";
+import { VideoStory } from "@/components/sections/service-page/video/VideoStory";
+import { IllustrationStory } from "@/components/sections/service-page/illustration/IllustrationStory";
 import { MarketingStory } from "@/components/sections/service-page/marketing/MarketingStory";
 import { headingText, services } from "@/content/site";
 import { servicePages } from "@/content/service-pages";
@@ -41,7 +44,10 @@ export default async function ServiceRoute({ params }: Props) {
   const service = await getService(params);
   const story = service.id === "marketing" ? <MarketingStory service={service} />
     : service.id === "design" ? <DesignStory service={service} />
-    : service.id === "web" ? <WebsiteStory service={service} /> : null;
+    : service.id === "web" ? <WebsiteStory service={service} />
+    : service.id === "software" ? <SoftwareStory service={service} />
+    : service.id === "video" ? <VideoStory service={service} />
+    : service.id === "illustration" ? <IllustrationStory service={service} /> : null;
 
   return (
     <>
